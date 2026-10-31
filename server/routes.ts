@@ -211,9 +211,73 @@ apiRouter.delete('/stock/:id', (req, res) => {
   res.json({ success: true });
 });
 
-// ==========================================
-// 4. ORDERS
-// ==========================================
+// Helper to escape CSV cell content
+function escapeCsv(val: any): string {
+  if (val === null || val === undefined) return '""';
+  const str = String(val).replace(/"/g, '""');
+  return `"${str}"`;
+}
+
+// Export Orders & Shipment Dispatch List as CSV (Excel compatible)
+apiRouter.get('/orders/export-csv', (req, res) => {
+  const { format, status } = req.query;
+  let orders = db.getOrders();
+  if (format === 'printed') {
+    orders = orders.filter(o => o.bookFormat === 'printed');
+  } else if (format === 'pdf') {
+    orders = orders.filter(o => o.bookFormat === 'pdf');
+  }
+
+  if (status && status !== 'all') {
+    orders = orders.filter(o => o.status === String(status));
+  }
+
+  const headers = [
+    'Order ID',
+    'កាលបរិច្ឆេទ (Date)',
+    'សៀវភៅ (Book)',
+    'ប្រភេទ (Format)',
+    'ចំនួន (Qty)',
+    'តម្លៃសរុប USD (Total)',
+    'ស្ថានភាពទូទាត់ (Payment)',
+    'ឈ្មោះអ្នកទទួល (Recipient)',
+    'លេខទូរស័ព្ទ (Phone)',
+    'អាសយដ្ឋានដឹកជញ្ជូន (Address)',
+    'ស្ថានភាពដឹកជញ្ជូន (Shipping Status)',
+    'លេខកូដតាមដាន (Tracking Code)',
+    'Telegram User',
+    'Telegram ID'
+  ];
+
+  const rows = orders.map(o => [
+    o.id,
+    o.createdAt ? new Date(o.createdAt).toLocaleString('en-US', { timeZone: 'Asia/Phnom_Penh' }) : '',
+    o.productName,
+    o.bookFormat === 'printed' ? 'សៀវភៅព្រីន (Hardcopy)' : 'សៀវភៅ PDF (E-Book)',
+    o.quantity,
+    o.totalAmount.toFixed(2),
+    o.status,
+    o.shippingRecipient || o.customerName || '',
+    o.shippingPhone || '',
+    o.shippingAddress || '',
+    o.shippingStatus || (o.status === 'completed' && o.bookFormat === 'printed' ? 'preparing' : ''),
+    o.trackingNumber || '',
+    `@${o.telegramUsername}`,
+    o.telegramId
+  ]);
+
+  // UTF-8 BOM so Excel opens Khmer characters with perfect rendering
+  const bom = '\uFEFF';
+  const csvContent = bom + [
+    headers.map(escapeCsv).join(','),
+    ...rows.map(r => r.map(escapeCsv).join(','))
+  ].join('\r\n');
+
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="shipment_dispatch_${Date.now()}.csv"`);
+  res.send(csvContent);
+});
+
 apiRouter.get('/orders', (req, res) => {
   let orders = db.getOrders();
   const { search, status } = req.query;

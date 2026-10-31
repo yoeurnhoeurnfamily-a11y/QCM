@@ -230,6 +230,25 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
           </h3>
           <p className="text-xs text-slate-400">តាមដានស្ថានភាពទូទាត់ CutLuy KHQR, ការទាញយក PDF និងការដឹកជញ្ជូនសៀវភៅព្រីន</p>
         </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href="/api/orders/export-csv?format=printed"
+            download
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition shadow-sm"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>📥 Export បញ្ជីដឹកជញ្ជូន (CSV / Excel)</span>
+          </a>
+          <a
+            href="/api/orders/export-csv?format=all"
+            download
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition border border-slate-700"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export ទាំងអស់</span>
+          </a>
+        </div>
       </div>
 
       {/* Search & Filter Bar */}

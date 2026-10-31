@@ -35,11 +35,10 @@ export const TelegramSimulatorModal: React.FC<TelegramSimulatorModalProps> = ({
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Active persistent reply keyboard
   const [replyKeyboard, setReplyKeyboard] = useState<string[][]>([
     ['🛒 ទិញសៀវភៅ', '📦 ពិនិត្យស្តុក'],
-    ['📜 ប្រវត្តិទិញ', '📞 ជំនួយ & ទំនាក់ទំនង'],
-    ['👥 កម្មវិធីណែនាំ']
+    ['🚚 តាមដានអីវ៉ាន់', '📜 ប្រវត្តិទិញ'],
+    ['📞 ជំនួយ & ទំនាក់ទំនង', '👥 កម្មវិធីណែនាំ']
   ]);
 
   const botName = settings?.botUsername ? `@${settings.botUsername}` : 'KHQR Store Bot';

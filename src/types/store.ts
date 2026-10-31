@@ -24,8 +24,17 @@ export interface Product {
   publisher?: string;
   isbn?: string;
   coverImage?: string;
+  samplePreviewText?: string;
+  sampleQuestions?: SampleQuestion[];
   updatedAt?: string;
   editHistory?: EditHistoryEntry[];
+}
+
+export interface SampleQuestion {
+  question: string;
+  options: string[];
+  answerIndex: number;
+  explanation?: string;
 }
 
 export interface EditHistoryEntry {
@@ -146,6 +155,7 @@ export interface BotSettings {
   botUsername: string;
   channelId: string;
   adminTelegramId?: string;
+  adminGroupId?: string;
   supportUsername: string;
   supportPhone?: string;
   welcomeMessage: string;

@@ -625,16 +625,30 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
             <div>
               <label className="block text-slate-300 font-medium mb-1">
-                Admin Telegram Chat ID (ទទួល Slip & Logistics)
+                Admin Telegram Chat ID (ទទួល Slip ផ្ទាល់ខ្លួន)
               </label>
               <input
                 type="text"
                 value={formData.adminTelegramId || ''}
                 onChange={(e) => handleChange('adminTelegramId', e.target.value)}
-                placeholder="ឧ. 99881122 ឬ Group ID"
+                placeholder="ឧ. 99881122"
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-indigo-500"
               />
-              <p className="text-[10px] text-slate-500 mt-1">ទទួល Slip ផ្ទាល់ និងប៊ូតុង [✅ Approve] / [❌ Reject]</p>
+              <p className="text-[10px] text-slate-500 mt-1">ទទួល Slip ផ្ទាល់ខ្លួន និងប៊ូតុង [✅ Approve] / [❌ Reject]</p>
+            </div>
+
+            <div>
+              <label className="block text-slate-300 font-medium mb-1">
+                Telegram Team Group ID (ជូនដំណឹង និងបញ្ជូន Slip ចូល Group)
+              </label>
+              <input
+                type="text"
+                value={formData.adminGroupId || ''}
+                onChange={(e) => handleChange('adminGroupId', e.target.value)}
+                placeholder="ឧ. -1002345678901 (Group Telegram)"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-indigo-500"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">សម្រាប់ឱ្យ Bot បញ្ជូនព័ត៌មាន Order ថ្មី និង Slip បង់ប្រាក់ចូល Group ក្រុមការងារ</p>
             </div>
 
             <div>

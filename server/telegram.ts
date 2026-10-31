@@ -68,8 +68,8 @@ export class TelegramBotService {
     return {
       keyboard: [
         [{ text: '🛒 ទិញសៀវភៅ' }, { text: '📦 ពិនិត្យស្តុក' }],
-        [{ text: '📜 ប្រវត្តិទិញ' }, { text: '📞 ជំនួយ & ទំនាក់ទំនង' }],
-        [{ text: '👥 កម្មវិធីណែនាំ' }]
+        [{ text: '🚚 តាមដានអីវ៉ាន់' }, { text: '📜 ប្រវត្តិទិញ' }],
+        [{ text: '📞 ជំនួយ & ទំនាក់ទំនង' }, { text: '👥 កម្មវិធីណែនាំ' }]
       ],
       resize_keyboard: true,
       persistent: true
@@ -276,6 +276,113 @@ export class TelegramBotService {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * Sends Document (e.g. PDF file or file URL) directly to Telegram Chat
+   */
+  public static async sendDocument(
+    chatId: number | string,
+    documentUrlOrFileId: string,
+    caption?: string,
+    options?: {
+      reply_markup?: any;
+      parse_mode?: 'HTML';
+      fileName?: string;
+    }
+  ): Promise<boolean> {
+    const settings = db.getSettings();
+    const token = settings.botToken?.trim();
+
+    // Broadcast to simulator
+    this.notifySimulator({
+      id: `sim_doc_${Date.now()}_${Math.random()}`,
+      sender: 'bot',
+      text: (caption ? caption + '\n\n' : '') + `📎 <b>ឯកសារ PDF៖</b> <a href="${documentUrlOrFileId}">${options?.fileName || 'សៀវភៅ_ពេញលេញ.pdf'}</a>`,
+      timestamp: new Date().toLocaleTimeString(),
+      inlineKeyboard: options?.reply_markup?.inline_keyboard
+    });
+
+    if (!token || String(chatId).startsWith('sim_')) {
+      return true;
+    }
+
+    try {
+      const response = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          document: documentUrlOrFileId,
+          caption: caption || '',
+          parse_mode: options?.parse_mode || 'HTML',
+          reply_markup: options?.reply_markup
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        this.handleApiError('sendDocument', chatId, response.status, errText);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      console.warn('Telegram sendDocument network error:', err?.message);
+      return false;
+    }
+  }
+
+  /**
+   * Dispatches alerts to all configured Admin targets (Private Chat, Team Group, Channel)
+   */
+  public static async notifyAdmins(
+    text: string,
+    options?: {
+      reply_markup?: any;
+      parse_mode?: 'HTML';
+      photoUrl?: string;
+    }
+  ): Promise<void> {
+    const settings = db.getSettings();
+    const targets = new Set<string>();
+
+    if (settings.adminTelegramId && settings.adminTelegramId.trim()) {
+      targets.add(settings.adminTelegramId.trim());
+    }
+    if (settings.adminGroupId && settings.adminGroupId.trim()) {
+      targets.add(settings.adminGroupId.trim());
+    }
+    if (settings.channelId && settings.channelId.trim()) {
+      targets.add(settings.channelId.trim());
+    }
+
+    // Always notify simulator
+    this.notifySimulator({
+      id: `sim_admin_alert_${Date.now()}_${Math.random()}`,
+      sender: 'bot',
+      text: `📢 <b>[Admin Alert Dispatch]</b>\n${text}`,
+      photoUrl: options?.photoUrl,
+      timestamp: new Date().toLocaleTimeString(),
+      inlineKeyboard: options?.reply_markup?.inline_keyboard
+    });
+
+    for (const target of targets) {
+      try {
+        if (options?.photoUrl) {
+          await this.sendPhotoFileId(target, options.photoUrl, text, {
+            reply_markup: options.reply_markup,
+            parse_mode: options.parse_mode || 'HTML'
+          });
+        } else {
+          await this.sendMessage(target, text, {
+            reply_markup: options?.reply_markup,
+            parse_mode: options?.parse_mode || 'HTML'
+          });
+        }
+      } catch (err: any) {
+        console.warn(`[Telegram] Failed to notify admin target ${target}:`, err?.message);
+      }
     }
   }
 
@@ -487,6 +594,342 @@ export class TelegramBotService {
 
     await this.sendMessage(chatId, msg, {
       reply_markup: this.getMainReplyKeyboard(),
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
+   * Self-Service Order Tracking Menu (🚚 តាមដានអីវ៉ាន់)
+   */
+  public static async handleOrderTracking(chatId: number | string) {
+    const strChatId = String(chatId);
+    const orders = db.getOrders();
+    const myOrders = orders.filter(o =>
+      o.telegramId === strChatId || (strChatId.startsWith('sim_') && o.telegramId.startsWith('sim_'))
+    ).slice(0, 5);
+
+    let text = `🚚 <b>ប្រព័ន្ធតាមដានកញ្ចប់អីវ៉ាន់ & ការបញ្ជាទិញ (ORDER TRACKING)</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    const inline_keyboard: Array<Array<{ text: string; callback_data?: string }>> = [];
+
+    if (myOrders.length === 0) {
+      text += `លោកអ្នកមិនទាន់មានប្រវត្តិបញ្ជាទិញសៀវភៅនៅឡើយទេ។\n\n` +
+        `🔎 <b>ស្វែងរកតាមលេខវិក្កយបត្រ៖</b>\n` +
+        `ប្រសិនបើលោកអ្នកមានលេខកូដវិក្កយបត្រ (Order ID ឧ. <code>ORD-892104</code>) សូមផ្ញើលេខនោះចូលក្នុង Chat នេះ ដើម្បីឆែកមើលភ្លាមៗ!`;
+    } else {
+      text += `📋 <b>ការបញ្ជាទិញថ្មីៗរបស់លោកអ្នក៖</b>\n\n`;
+      for (const ord of myOrders) {
+        const isPrinted = ord.bookFormat === 'printed';
+        let statusBadge = '⏳ រង់ចាំទូទាត់';
+        if (ord.status === 'completed') {
+          if (isPrinted) {
+            statusBadge = ord.shippingStatus === 'shipped'
+              ? '🚚 កំពុងដឹកជញ្ជូន'
+              : ord.shippingStatus === 'delivered'
+              ? '✅ បានប្រគល់ជូន'
+              : '📦 កំពុងរៀបចំវេចខ្ចប់';
+          } else {
+            statusBadge = '✅ បានផ្ញើសៀវភៅ PDF';
+          }
+        } else if (ord.status === 'rejected') {
+          statusBadge = '❌ បានបដិសេធ';
+        }
+
+        text += `• <b>#${ord.id}</b> | ${ord.productName.slice(0, 28)}...\n` +
+          `  └ ស្ថានភាព៖ <b>${statusBadge}</b>\n` +
+          (ord.trackingNumber ? `  └ លេខ Tracking: <code>${ord.trackingNumber}</code>\n` : '') +
+          `\n`;
+
+        inline_keyboard.push([
+          { text: `🔍 ពិនិត្យលម្អិត #${ord.id}`, callback_data: `track_order_${ord.id}` }
+        ]);
+      }
+      text += `👉 <i>ឬលោកអ្នកអាចផ្ញើលេខវិក្កយបត្រផ្សេងទៀត (ឧ. ORD-XXXXXX) ចូលទីនេះបាន!</i>`;
+    }
+
+    inline_keyboard.push([
+      { text: '🛒 ទិញសៀវភៅថ្មី', callback_data: 'catalog_menu' },
+      { text: '💬 សួរ Admin', callback_data: 'support_chat' }
+    ]);
+
+    // Set state so next text input will be treated as tracking search
+    this.customerStates.set(strChatId, { step: 'awaiting_tracking_search', data: {} });
+
+    await this.sendMessage(chatId, text, {
+      reply_markup: { inline_keyboard },
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
+   * Search and display detailed Order Tracking Card
+   */
+  public static async handleTrackingQuery(chatId: number | string, queryText: string) {
+    this.customerStates.delete(String(chatId));
+    const cleanId = queryText.replace(/#/g, '').trim().toUpperCase();
+    const order = db.getOrders().find(o => o.id.toUpperCase() === cleanId || o.id.toUpperCase().includes(cleanId));
+
+    if (!order) {
+      await this.sendMessage(
+        chatId,
+        `⚠️ <b>រកមិនឃើញវិក្កយបត្រ "${cleanId}" ឡើយ!</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+        `សូមពិនិត្យមើលលេខកូដវិក្កយបត្រឡើងវិញ (ឧទាហរណ៍៖ <code>ORD-892104</code>) ឬទាក់ទងមក Admin ប្រសិនបើលោកអ្នកត្រូវការជំនួយ។`,
+        {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '🔄 ព្យាយាមឆែកម្តងទៀត', callback_data: 'track_menu' }],
+              [{ text: '💬 ទាក់ទង Admin', callback_data: 'support_chat' }]
+            ]
+          },
+          parse_mode: 'HTML'
+        }
+      );
+      return;
+    }
+
+    const isPrinted = order.bookFormat === 'printed';
+    const settings = db.getSettings();
+
+    let trackCard = `🚚 <b>ព័ត៌មានលម្អិតនៃការដឹកជញ្ជូន (SHIPMENT TRACKING)</b>\n━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `┌ 🔖 <b>លេខវិក្កយបត្រ៖</b> <code>#${order.id}</code>\n` +
+      `├ 📚 <b>សៀវភៅ៖</b> <b>${order.productName}</b>\n` +
+      `├ 🏷️ <b>ប្រភេទ៖</b> ${isPrinted ? '📖 សៀវភៅក្រដាស (Hardcopy)' : '📄 សៀវភៅ PDF (E-Book)'}\n` +
+      `├ 🔢 <b>បរិមាណ៖</b> <b>${order.quantity}</b>\n` +
+      `└ 💵 <b>ទឹកប្រាក់៖</b> <code>$${order.totalAmount.toFixed(2)} USD</code>\n\n`;
+
+    if (isPrinted) {
+      const step1 = '✅';
+      const step2 = order.status === 'completed' ? '✅' : '⏳';
+      const step3 = (order.shippingStatus === 'shipped' || order.shippingStatus === 'delivered') ? '✅' : '⏳';
+      const step4 = order.shippingStatus === 'delivered' ? '✅' : '⏳';
+
+      trackCard += `📍 <b>ដំណាក់កាលដឹកជញ្ជូន (Status Stepper):</b>\n` +
+        `${step1} <b>១. ការទូទាត់ប្រាក់៖</b> ទទួលបានជោគជ័យ\n` +
+        `${step2} <b>២. ការវេចខ្ចប់៖</b> ${order.shippingStatus === 'preparing' || order.status === 'completed' ? 'កំពុងរៀបចំសៀវភៅ' : 'រង់ចាំ'}\n` +
+        `${step3} <b>៣. ការប្រគល់ជូនអ្នកដឹក៖</b> ${order.shippingStatus === 'shipped' ? 'កំពុងដឹកតាមផ្លូវ' : order.shippingStatus === 'delivered' ? 'ដឹកដល់គោលដៅ' : 'រង់ចាំចេញដំណើរ'}\n` +
+        `${step4} <b>៤. ការប្រគល់ដល់ដៃ៖</b> ${order.shippingStatus === 'delivered' ? 'បានប្រគល់ជូនរួចរាល់' : 'កំពុងរង់ចាំ'}\n\n` +
+        `📦 <b>ព័ត៌មានកញ្ចប់អីវ៉ាន់៖</b>\n` +
+        `┌ 👤 <b>អ្នកទទួល៖</b> <b>${order.shippingRecipient || order.customerName}</b>\n` +
+        `├ 📞 <b>លេខទូរស័ព្ទ៖</b> <code>${order.shippingPhone || 'មិនទាន់បញ្ជាក់'}</code>\n` +
+        `├ 📍 <b>អាសយដ្ឋាន/ក្រុមហ៊ុនដឹក៖</b> ${order.shippingAddress || 'រាជធានីភ្នំពេញ'}\n` +
+        `└ 🏷️ <b>លេខកូដតាមដាន (Tracking Code):</b> <code>${order.trackingNumber || 'កំពុងរង់ចាំលេខកូដពីក្រុមហ៊ុនដឹក'}</code>\n\n` +
+        `💡 <i>* ប្រសិនបើមានលេខ Tracking លោកអ្នកអាចយកទៅផ្ទៀងផ្ទាត់លើ App វីរៈប៊ុនថាំ (VET) ឬ J&T Express បាន!</i>`;
+    } else {
+      trackCard += `⚡ <b>ស្ថានភាព E-Book (PDF):</b>\n` +
+        `• ស្ថានភាព៖ <b>${order.status === 'completed' ? '✅ បានទូទាត់ និងផ្ញើសៀវភៅរួចរាល់' : '⏳ កំពុងដំណើរការ'}</b>\n` +
+        (order.deliveredItems && order.deliveredItems.length > 0 ? `• តំណភ្ជាប់ទាញយក៖ <code>${order.deliveredItems[0]}</code>\n` : '');
+    }
+
+    const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
+      [
+        { text: '💬 សួរនាំ Admin បន្ថែម', url: `https://t.me/${settings.supportUsername || 'kh_bookstore_support'}` }
+      ],
+      [
+        { text: '🔙 ត្រឡប់ទៅតាមដាន', callback_data: 'track_menu' },
+        { text: '🏠 Menu ដើម', callback_data: 'menu_main' }
+      ]
+    ];
+
+    await this.sendMessage(chatId, trackCard, {
+      reply_markup: { inline_keyboard },
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
+   * Sample Questions Generator for Any Product
+   */
+  public static getProductSampleQuestions(product: Product): { previewText: string; questions: Array<{ question: string; options: string[]; answerIndex: number; explanation: string }> } {
+    if (product.sampleQuestions && product.sampleQuestions.length > 0) {
+      return {
+        previewText: product.samplePreviewText || `📖 <b>គំរូមាតិកា & វិញ្ញាសាសាកល្បង៖</b>\n${product.description}`,
+        questions: product.sampleQuestions.map(q => ({
+          question: q.question,
+          options: q.options,
+          answerIndex: q.answerIndex,
+          explanation: q.explanation || 'ចម្លើយត្រឹមត្រូវស្របតាមក្បួនគរុកោសល្យ និងកម្មវិធីសិក្សាជាតិ។'
+        }))
+      };
+    }
+
+    const cat = (product.category || '').toLowerCase();
+    const name = (product.name || '').toLowerCase();
+
+    if (cat.includes('មតេយ្យ') || name.includes('មតេយ្យ') || cat.includes('preschool')) {
+      return {
+        previewText: `📖 <b>គំរូមាតិកាឈុតគ្រូមតេយ្យ (Preschool Syllabus Sample):</b>\n• ជំពូកទី ១៖ ចិត្តវិទ្យាអភិវឌ្ឍន៍កុមារតូច (០-៦ ឆ្នាំ)\n• ជំពូកទី ២៖ ការរៀបចំបរិយាកាសថ្នាក់រៀនមតេយ្យ\n• ជំពូកទី ៣៖ ការបង្រៀនតាមរយៈការលេង (Play-based Learning)`,
+        questions: [
+          {
+            question: 'តើវិធីសាស្ត្រគរុកោសល្យណាដែលស័ក្តិសមបំផុតសម្រាប់ការបង្រៀនកុមារតូចមតេយ្យសិក្សា?',
+            options: ['A. ការរៀនតាមរយៈការលេង (Play-based learning)', 'B. ការឱ្យទន្ទេញមេរៀនដោយបង្ខំ', 'C. ការធ្វើតេស្តសរសេររាល់ថ្ងៃ', 'D. ការឱ្យអង្គុយស្តាប់គ្រូតែម្យ៉ាង'],
+            answerIndex: 0,
+            explanation: 'កុមារតូចលូតលាស់សតិបញ្ញា និងបំណិនសង្គមបានល្អបំផុតតាមរយៈសកម្មភាពលេង និងការប៉ះពាល់វត្ថុជាក់ស្តែង (Play-based learning)។'
+          },
+          {
+            question: 'តើការអភិវឌ្ឍផ្នែកណាមួយដែលមានសារៈសំខាន់ស្មើគ្នានឹងការយល់ដឹងភាសានៅវ័យមតេយ្យ?',
+            options: ['A. ការអភិវឌ្ឍអារម្មណ៍ និងសង្គម (Social-Emotional)', 'B. ការគិតលេខកម្រិតខ្ពស់', 'C. ការសរសេរអក្សរផ្ចិត', 'D. ការទន្ទេញរូបមន្ត'],
+            answerIndex: 0,
+            explanation: 'ការគ្រប់គ្រងអារម្មណ៍ និងការចុះសម្រុងជាមួយមិត្តភក្តិ គឺជាមូលដ្ឋានគ្រឹះរឹងមាំសម្រាប់ភាពជោគជ័យនៃការសិក្សានាពេលអនាគត។'
+          }
+        ]
+      };
+    }
+
+    if (cat.includes('បឋម') || name.includes('បឋម') || cat.includes('primary')) {
+      return {
+        previewText: `📖 <b>គំរូមាតិកាឈុតគ្រូបឋមសិក្សា (Primary School Syllabus Sample):</b>\n• ជំពូកទី ១៖ វិធីសាស្ត្របង្រៀនភាសាខ្មែរដំបូង (អំណាន & សំណេរ)\n• ជំពូកទី ២៖ គរុកោសល្យគណិតវិទ្យាគ្រឹះ និងរង្វាស់រង្វាល់\n• ជំពូកទី ៣៖ ការវាយតម្លៃលទ្ធផលសិក្សាតាមស្តង់ដារបឋម`,
+        questions: [
+          {
+            question: 'តើគោលការណ៍ចម្បងនៃការបង្រៀនសិស្សបឋមសិក្សាគឺអ្វី?',
+            options: ['A. ពីងាយទៅលំបាក និងពីជាក់ស្តែងទៅអរូបិយ', 'B. ពីទ្រឹស្តីស្មុគស្មាញទៅលំហាត់ងាយ', 'C. ផ្តោតលើការប្រឡងតែមួយមុខ', 'D. បង្រៀនលឿនដើម្បីចប់កម្មវិធី'],
+            answerIndex: 0,
+            explanation: 'ការបង្រៀនបឋមត្រូវចាប់ផ្តើមពីវត្ថុជាក់ស្តែង (Concrete) ទៅកាន់គំនិតអរូបិយ (Abstract) និងពីងាយទៅលំបាក។'
+          },
+          {
+            question: 'ក្នុងការរៀបចំកិច្ចតែងការបង្រៀន តើជំហានណាដែលជាការវាស់ស្ទង់ការយល់ដឹងរបស់សិស្ស?',
+            options: ['A. ជំហានទី ៤ (ការពង្រឹងពុទ្ធិ)', 'B. ជំហានទី ១ (រដ្ឋបាលថ្នាក់)', 'C. ជំហានទី ២ (កែរំលឹកមេរៀនចាស់)', 'D. ជំហានទី ៥ (បណ្តាំផ្ញើ)'],
+            answerIndex: 0,
+            explanation: 'ជំហានទី ៤ គឺការពង្រឹងពុទ្ធិ តាមរយៈការដាក់សំណួរ ឬលំហាត់សង្ខេបដើម្បីវាយតម្លៃការយល់ដឹងរបស់សិស្សលើមេរៀនថ្មី។'
+          }
+        ]
+      };
+    }
+
+    // Default general exam sample questions
+    return {
+      previewText: `📖 <b>គំរូមាតិកា & វិញ្ញាសាសាកល្បង៖</b>\n• កម្រងសំណួរ QCM ជ្រើសរើសចម្លើយត្រឹមត្រូវ\n• គន្លឹះ និងរូបមន្តដោះស្រាយលឿន\n• ការពន្យល់ហេតុផល និងយោងតាមច្បាប់/កម្មវិធីសិក្សាជាតិ`,
+      questions: [
+        {
+          question: 'តើការប្រឡង QCM ទាមទារបច្ចេកទេសអ្វីខ្លះដើម្បីទទួលបានពិន្ទុខ្ពស់?',
+          options: ['A. ការអានសំណួរឱ្យច្បាស់ និងការកាត់ចម្លើយខុសចេញ (Elimination)', 'B. ការទាយចៃដន្យដោយមិនពិចារណា', 'C. ការជ្រើសតែចម្លើយដែលវែងជាងគេ', 'D. ការទុកចោលមិនឆ្លើយ'],
+          answerIndex: 0,
+          explanation: 'បច្ចេកទេសកាត់ចម្លើយខុស (Elimination Method) ជួយបង្កើនឱកាសជ្រើសរើសចម្លើយត្រឹមត្រូវរហូតដល់ ៨០% ឡើងទៅ។'
+        },
+        {
+          question: 'តើសៀវភៅនេះផ្តល់អត្ថប្រយោជន៍អ្វីខ្លះដល់អ្នកត្រៀមប្រឡង?',
+          options: ['A. វិញ្ញាសាស្របតាមក្រសួង + ចម្លើយពន្យល់លម្អិត ១០០%', 'B. គ្រាន់តែជាកម្រងសំណួរគ្មានចម្លើយ', 'C. គ្មានការពន្យល់', 'D. ព័ត៌មានចាស់ហួសសម័យ'],
+          answerIndex: 0,
+          explanation: 'សៀវភៅនេះចងក្រងឡើងដោយសាស្រ្តាចារ្យជំនាញ មានចម្លើយផ្ទៀងផ្ទាត់ត្រឹមត្រូវ និងគន្លឹះដោះស្រាយច្បាស់លាស់។'
+        }
+      ]
+    };
+  }
+
+  /**
+   * Free Sample Preview & Interactive QCM Quiz
+   */
+  public static async handleProductSample(chatId: number | string, productId: string, questionIdx = 0, messageIdToEdit?: number) {
+    const product = db.getProducts().find(p => p.id === productId);
+    if (!product) {
+      await this.sendMessage(chatId, '❌ រកមិនឃើញសៀវភៅនេះឡើយ។');
+      return;
+    }
+
+    const sampleData = this.getProductSampleQuestions(product);
+    const questions = sampleData.questions;
+    const currentQ = questions[questionIdx] || questions[0];
+
+    let text = `📖 <b>គំរូសៀវភៅ & វិញ្ញាសាសាកល្បង (SAMPLE PREVIEW)</b>\n━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `📚 <b>សៀវភៅ៖</b> <b>${product.name}</b>\n` +
+      (product.author ? `🖋️ <b>អ្នកនិពន្ធ៖</b> ${product.author}\n` : '') +
+      `💰 <b>តម្លៃ៖</b> <code>$${product.price.toFixed(2)} USD</code>\n\n` +
+      `${sampleData.previewText}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n` +
+      `📝 <b>សំណួរគំរូសាកល្បងទី ${questionIdx + 1}/${questions.length}៖</b>\n\n` +
+      `❓ <b>${currentQ.question}</b>\n\n` +
+      `👇 <i>សូមជ្រើសរើសចម្លើយត្រឹមត្រូវខាងក្រោម ដើម្បីផ្ទៀងផ្ទាត់៖</i>`;
+
+    const inline_keyboard: Array<Array<{ text: string; callback_data: string }>> = [];
+
+    // Add option buttons
+    currentQ.options.forEach((opt, optIdx) => {
+      inline_keyboard.push([
+        { text: opt, callback_data: `quiz_${productId}_${questionIdx}_${optIdx}` }
+      ]);
+    });
+
+    // Action buttons
+    inline_keyboard.push([
+      { text: `🛒 កម្មង់ទិញសៀវភៅពេញ ($${product.price.toFixed(2)})`, callback_data: `order_checkout_${productId}_1` }
+    ]);
+    inline_keyboard.push([
+      { text: '🔙 ត្រឡប់ទៅមើលសៀវភៅ', callback_data: `prod_view_${productId}` }
+    ]);
+
+    if (messageIdToEdit) {
+      const edited = await this.editMessageText(chatId, messageIdToEdit, text, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+      if (edited) return;
+    }
+
+    await this.sendMessage(chatId, text, {
+      reply_markup: { inline_keyboard },
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
+   * Handle user answering a sample QCM question
+   */
+  public static async handleSampleQuizAnswer(
+    chatId: number | string,
+    productId: string,
+    questionIdx: number,
+    chosenOption: number,
+    messageIdToEdit?: number
+  ) {
+    const product = db.getProducts().find(p => p.id === productId);
+    if (!product) return;
+
+    const sampleData = this.getProductSampleQuestions(product);
+    const questions = sampleData.questions;
+    const currentQ = questions[questionIdx] || questions[0];
+    const isCorrect = chosenOption === currentQ.answerIndex;
+
+    let text = `📝 <b>លទ្ធផលនៃការសាកល្បងសំណួរទី ${questionIdx + 1}/${questions.length}</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    if (isCorrect) {
+      text += `🎉 <b>ចម្លើយត្រឹមត្រូវ! (EXCELLENT)</b> ✅\n\n` +
+        `• ចម្លើយរបស់លោកអ្នក៖ <b>${currentQ.options[chosenOption]}</b>\n\n` +
+        `💡 <b>គន្លឹះ និងការពន្យល់៖</b>\n${currentQ.explanation}\n`;
+    } else {
+      text += `❌ <b>មិនទាន់ត្រឹមត្រូវទេ! (INCORRECT)</b>\n\n` +
+        `• ចម្លើយរបស់លោកអ្នក៖ ${currentQ.options[chosenOption]}\n` +
+        `• <b>ចម្លើយពិតប្រាកដគឺ៖</b> <b>${currentQ.options[currentQ.answerIndex]}</b> ✅\n\n` +
+        `💡 <b>គន្លឹះ និងការពន្យល់៖</b>\n${currentQ.explanation}\n`;
+    }
+
+    text += `\n✨ <i>នៅក្នុងសៀវភៅពេញលេញ មានកម្រងសំណួរ QCM ជាង ១,០០០ សំណួរ និងគន្លឹះដោះស្រាយលម្អិត ១០០% បែបនេះ!</i>`;
+
+    const inline_keyboard: Array<Array<{ text: string; callback_data: string }>> = [];
+
+    // Next question button if available
+    if (questionIdx + 1 < questions.length) {
+      inline_keyboard.push([
+        { text: `➡️ សំណួរគំរូបន្ទាប់ (${questionIdx + 2}/${questions.length})`, callback_data: `sample_next_${productId}_${questionIdx + 1}` }
+      ]);
+    }
+
+    inline_keyboard.push([
+      { text: `🛒 កម្មង់ទិញសៀវភៅពេញ ($${product.price.toFixed(2)})`, callback_data: `order_checkout_${productId}_1` }
+    ]);
+
+    inline_keyboard.push([
+      { text: '🔙 ត្រឡប់ទៅមើលសៀវភៅ', callback_data: `prod_view_${productId}` }
+    ]);
+
+    if (messageIdToEdit) {
+      const edited = await this.editMessageText(chatId, messageIdToEdit, text, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+      if (edited) return;
+    }
+
+    await this.sendMessage(chatId, text, {
+      reply_markup: { inline_keyboard },
       parse_mode: 'HTML'
     });
   }
@@ -891,7 +1334,8 @@ export class TelegramBotService {
         }
       ],
       [
-        { text: '💬 សាកសួរ Admin មុនទិញ', url: `https://t.me/${supportUser}` }
+        { text: '👀 មើលគំរូ & សាកល្បង QCM', callback_data: `prod_sample_${productId}` },
+        { text: '💬 សាកសួរ Admin', url: `https://t.me/${supportUser}` }
       ],
       [
         { text: '🔙 មើលសៀវភៅផ្សេងទៀត', callback_data: 'catalog_back' },
@@ -1139,8 +1583,7 @@ export class TelegramBotService {
       parse_mode: 'HTML'
     });
 
-    // Notify Admin Channel / Admin Telegram ID
-    const adminTarget = settings.adminTelegramId || settings.channelId;
+    // Notify Admin Team Group, Channel, and Admin Private Chat with interactive Approve / Reject buttons
     const adminAlertText = `🔔 <b>វិក្កយបត្របង់ប្រាក់រង់ចាំការបញ្ជាក់ (SLIP PENDING APPROVAL)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
       `┌ 🔖 <b>លេខវិក្កយបត្រ៖</b> <code>#${pendingOrder.id}</code>\n` +
       `├ 📚 <b>សៀវភៅ៖</b> <b>${pendingOrder.productName}</b>\n` +
@@ -1160,22 +1603,10 @@ export class TelegramBotService {
       ]
     };
 
-    if (adminTarget) {
-      if (fileIdOrUrl && !fileIdOrUrl.startsWith('manual_')) {
-        await this.sendPhotoFileId(adminTarget, fileIdOrUrl, adminAlertText, { reply_markup: adminKeyboard });
-      } else {
-        await this.sendMessage(adminTarget, adminAlertText, { reply_markup: adminKeyboard, parse_mode: 'HTML' });
-      }
-    } else {
-      // Broadcast to simulator listeners
-      this.notifySimulator({
-        id: `sim_admin_alert_${Date.now()}`,
-        sender: 'bot',
-        text: adminAlertText,
-        timestamp: new Date().toLocaleTimeString(),
-        inlineKeyboard: adminKeyboard.inline_keyboard
-      });
-    }
+    await this.notifyAdmins(adminAlertText, {
+      reply_markup: adminKeyboard,
+      photoUrl: (fileIdOrUrl && !fileIdOrUrl.startsWith('manual_')) ? fileIdOrUrl : undefined
+    });
   }
 
   /**
@@ -1315,15 +1746,28 @@ export class TelegramBotService {
         : `⚡ <b>ឯកសារ PDF៖</b> ប្រព័ន្ធនឹងផ្ញើតំណភ្ជាប់ទាញយក PDF ជូនភ្លាមៗដោយស្វ័យប្រវត្តិនឹងពេលទូទាត់ជោគជ័យ!`);
 
     const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const bakongDeepLink = payment.checkoutUrl || `https://link.payway.com.kh/checkout?qr=${encodeURIComponent(payment.qrString || orderId)}`;
     const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [
-        { text: '🔄 ពិនិត្យការទូទាត់ (Check Payment)', callback_data: `check_pay_${orderId}` }
+        { text: '📲 បើកក្នុង ABA / Bakong App', url: bakongDeepLink },
+        { text: '🔄 ពិនិត្យការទូទាត់ (Check)', callback_data: `check_pay_${orderId}` }
       ],
       [
         { text: '💬 ជំនួយ Admin', url: `https://t.me/${supportUser}` },
-        { text: '❌ បោះបង់ការទិញ (Cancel)', callback_data: `cancel_order_${orderId}` }
+        { text: '❌ បោះបង់ (Cancel)', callback_data: `cancel_order_${orderId}` }
       ]
     ];
+
+    // Notify Admin Team Group and Private Chat of new order creation
+    this.notifyAdmins(
+      `🛒 <b>ការបញ្ជាទិញថ្មី (#${orderId})</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+      `┌ 📚 <b>សៀវភៅ៖</b> <b>${product.name}</b> (${quantity} ${unitLabel})\n` +
+      `├ 💵 <b>ទឹកប្រាក់៖</b> <code>$${pricing.totalAmount.toFixed(2)} USD</code>\n` +
+      `├ 🏷️ <b>ប្រភេទ៖</b> ${isPrinted ? '📖 សៀវភៅព្រីន Hardcopy' : '📄 សៀវភៅ PDF (E-Book)'}\n` +
+      `└ 👤 <b>អតិថិជន៖</b> @${username} (ID: <code>${chatId}</code>)\n` +
+      (isPrinted ? `\n🚚 <b>ព័ត៌មានដឹកជញ្ជូន៖</b>\n• អ្នកទទួល៖ ${newOrder.shippingRecipient}\n• ទូរស័ព្ទ៖ ${newOrder.shippingPhone}\n• ទីតាំង៖ ${newOrder.shippingAddress}\n` : '') +
+      `\n<i>* អតិថិជនកំពុងដំណើរការទូទាត់ KHQR ឬផ្ញើ Slip...</i>`
+    ).catch(() => {});
 
     if (payment.qrBuffer) {
       await this.sendPhoto(chatId, payment.qrBuffer, caption, {
@@ -1527,36 +1971,43 @@ export class TelegramBotService {
       parse_mode: 'HTML'
     });
 
-    // Alert Admin Channel or Admin Telegram with Logistics Card
-    const adminChatTarget = settings.channelId || settings.adminTelegramId;
-    if (adminChatTarget) {
-      if (isPrinted) {
-        await this.sendMessage(
-          adminChatTarget,
-          `📦 <b>កញ្ចប់សៀវភៅត្រូវរៀបចំផ្ញើ (HARDCOPY DISPATCH ORDER)!</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
-          `┌ 🔖 <b>វិក្កយបត្រ៖</b> <code>#${order.id}</code>\n` +
-          `├ 📚 <b>សៀវភៅ៖</b> <b>${order.productName}</b> (x${order.quantity} ក្បាល)\n` +
-          `├ 👤 <b>អ្នកទទួល៖</b> <b>${order.shippingRecipient || order.customerName || order.telegramUsername}</b>\n` +
-          `├ 📞 <b>លេខទូរស័ព្ទ៖</b> <code>${order.shippingPhone || 'មិនទាន់បញ្ជាក់'}</code>\n` +
-          `├ 📍 <b>អាសយដ្ឋាន/ក្រុមហ៊ុនដឹក៖</b> ${order.shippingAddress || 'រាជធានីភ្នំពេញ'}\n` +
-          `├ 💵 <b>ទឹកប្រាក់បានបង់៖</b> <code>$${order.totalAmount.toFixed(2)} USD</code>\n` +
-          `├ 🏷️ <b>Telegram អតិថិជន៖</b> @${order.telegramUsername} (ID: <code>${order.telegramId}</code>)\n` +
-          `└ 📦 <b>SKU សៀវភៅ៖</b> ${deliveredItems.join(', ')}\n\n` +
-          `🚚 <i>សូមរៀបចំវេចខ្ចប់ និងផ្ញើតាម VET Express / J&T Express / សេវាដឹកភ្នំពេញ ជូនអតិថិជន!</i>`,
-          { parse_mode: 'HTML' }
-        );
-      } else {
-        await this.sendMessage(
-          adminChatTarget,
-          `🛒 <b>ការលក់សៀវភៅ PDF ជោគជ័យថ្មី (New PDF Order)!</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
-          `┌ 🔖 <b>វិក្កយបត្រ៖</b> <code>#${order.id}</code>\n` +
-          `├ 📄 <b>សៀវភៅ៖</b> <b>${order.productName}</b> (x${order.quantity} ច្បាប់)\n` +
-          `├ 💵 <b>ទឹកប្រាក់៖</b> <code>$${order.totalAmount.toFixed(2)} USD</code>\n` +
-          `└ 👤 <b>អតិថិជន៖</b> @${order.telegramUsername} (ID: <code>${order.telegramId}</code>)\n` +
-          `⚡ <i>ប្រព័ន្ធបានផ្ញើតំណភ្ជាប់ PDF ជូនអតិថិជនរួចរាល់ដោយស្វ័យប្រវត្តិ!</i>`,
-          { parse_mode: 'HTML' }
-        );
-      }
+    // Send direct PDF Document file into Telegram chat
+    if (!isPrinted) {
+      const pdfTargetUrl = (deliveredItems[0] && deliveredItems[0].startsWith('http'))
+        ? deliveredItems[0]
+        : (product?.pdfDownloadUrl || 'https://khbookstore.com/downloads/sample.pdf');
+      
+      await this.sendDocument(
+        chatId,
+        pdfTargetUrl,
+        `📥 <b>ឯកសារ PDF សៀវភៅពេញលេញ៖</b>\n<b>${order.productName}</b>\n\n💡 <i>លោកអ្នកអាចចុចបើក ឬ Save ទុកក្នុង Telegram Saved Messages ដើម្បីអានពេលគ្មាន Internet។</i>`,
+        { fileName: `${order.productName.slice(0, 30)}.pdf` }
+      );
+    }
+
+    // Alert Admin Channel, Team Group, and Admin Private Chat with Logistics Card
+    if (isPrinted) {
+      await this.notifyAdmins(
+        `📦 <b>កញ្ចប់សៀវភៅត្រូវរៀបចំផ្ញើ (HARDCOPY DISPATCH ORDER)!</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+        `┌ 🔖 <b>វិក្កយបត្រ៖</b> <code>#${order.id}</code>\n` +
+        `├ 📚 <b>សៀវភៅ៖</b> <b>${order.productName}</b> (x${order.quantity} ក្បាល)\n` +
+        `├ 👤 <b>អ្នកទទួល៖</b> <b>${order.shippingRecipient || order.customerName || order.telegramUsername}</b>\n` +
+        `├ 📞 <b>លេខទូរស័ព្ទ៖</b> <code>${order.shippingPhone || 'មិនទាន់បញ្ជាក់'}</code>\n` +
+        `├ 📍 <b>អាសយដ្ឋាន/ក្រុមហ៊ុនដឹក៖</b> ${order.shippingAddress || 'រាជធានីភ្នំពេញ'}\n` +
+        `├ 💵 <b>ទឹកប្រាក់បានបង់៖</b> <code>$${order.totalAmount.toFixed(2)} USD</code>\n` +
+        `├ 🏷️ <b>Telegram អតិថិជន៖</b> @${order.telegramUsername} (ID: <code>${order.telegramId}</code>)\n` +
+        `└ 📦 <b>SKU សៀវភៅ៖</b> ${deliveredItems.join(', ')}\n\n` +
+        `🚚 <i>សូមរៀបចំវេចខ្ចប់ និងផ្ញើតាម VET Express / J&T Express / សេវាដឹកភ្នំពេញ ជូនអតិថិជន!</i>`
+      );
+    } else {
+      await this.notifyAdmins(
+        `🛒 <b>ការលក់សៀវភៅ PDF ជោគជ័យថ្មី (New PDF Order)!</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+        `┌ 🔖 <b>វិក្កយបត្រ៖</b> <code>#${order.id}</code>\n` +
+        `├ 📄 <b>សៀវភៅ៖</b> <b>${order.productName}</b> (x${order.quantity} ច្បាប់)\n` +
+        `├ 💵 <b>ទឹកប្រាក់៖</b> <code>$${order.totalAmount.toFixed(2)} USD</code>\n` +
+        `└ 👤 <b>អតិថិជន៖</b> @${order.telegramUsername} (ID: <code>${order.telegramId}</code>)\n` +
+        `⚡ <i>ប្រព័ន្ធបានផ្ញើទាំងតំណភ្ជាប់ & File PDF ជូនអតិថិជនរួចរាល់ដោយស្វ័យប្រវត្តិ!</i>`
+      );
     }
 
     return true;
@@ -1766,7 +2217,49 @@ export class TelegramBotService {
       return;
     }
 
-    // 10. Quick Actions & Navigation
+    // 10. Sample Preview & Interactive QCM Quiz
+    if (data.startsWith('prod_sample_')) {
+      const productId = data.replace('prod_sample_', '');
+      await this.handleProductSample(chatId, productId, 0);
+      return;
+    }
+
+    if (data.startsWith('sample_next_')) {
+      const rest = data.replace('sample_next_', '');
+      const lastUnderscore = rest.lastIndexOf('_');
+      if (lastUnderscore !== -1) {
+        const productId = rest.slice(0, lastUnderscore);
+        const qIdx = parseInt(rest.slice(lastUnderscore + 1), 10) || 0;
+        await this.handleProductSample(chatId, productId, qIdx, messageId);
+      }
+      return;
+    }
+
+    if (data.startsWith('quiz_')) {
+      const rest = data.replace('quiz_', '');
+      const parts = rest.split('_');
+      if (parts.length >= 3) {
+        const optIdx = parseInt(parts.pop()!, 10);
+        const qIdx = parseInt(parts.pop()!, 10);
+        const productId = parts.join('_');
+        await this.handleSampleQuizAnswer(chatId, productId, qIdx, optIdx, messageId);
+      }
+      return;
+    }
+
+    // 11. Self-Service Order Tracking Callbacks
+    if (data.startsWith('track_order_')) {
+      const orderId = data.replace('track_order_', '');
+      await this.handleTrackingQuery(chatId, orderId);
+      return;
+    }
+
+    if (data === 'track_menu') {
+      await this.handleOrderTracking(chatId);
+      return;
+    }
+
+    // 12. Quick Actions & Navigation
     if (data === 'support_chat') {
       await this.sendSupport(chatId);
       return;
@@ -1828,6 +2321,24 @@ export class TelegramBotService {
       const parts = rawText.split(' ');
       const payload = parts.length > 1 ? parts[1] : undefined;
       await this.handleStart(chatId, username, firstName, user.last_name, payload);
+      return;
+    }
+
+    // Tracking check (🚚 តាមដានអីវ៉ាន់) or direct Order ID search
+    if (
+      rawText.includes('តាមដាន') ||
+      rawText.toLowerCase().includes('track')
+    ) {
+      await this.handleOrderTracking(chatId);
+      return;
+    }
+
+    if (
+      rawText.toUpperCase().startsWith('ORD-') ||
+      rawText.toUpperCase().startsWith('#ORD-') ||
+      (activeSession && activeSession.step === 'awaiting_tracking_search')
+    ) {
+      await this.handleTrackingQuery(chatId, rawText);
       return;
     }
 

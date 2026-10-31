@@ -308,6 +308,8 @@ const INITIAL_SETTINGS: BotSettings = {
   botToken: DEFAULT_TELEGRAM_BOT_TOKEN,
   botUsername: DEFAULT_TELEGRAM_BOT_USERNAME,
   channelId: '',
+  adminTelegramId: '',
+  adminGroupId: '',
   supportUsername: 'kh_bookstore_support',
   welcomeMessage: 'សូមស្វាគមន៍មកកាន់ បណ្ណាគារសៀវភៅត្រៀមប្រឡង & QCM KH Store! 📚🎓\n\nយើងខ្ញុំមានផ្គត់ផ្គង់៖\n• 📘 សៀវភៅត្រៀមប្រឡងបាក់ឌុប & ក្របខ័ណ្ឌរដ្ឋ\n• 📝 កម្រងសំណួរ QCM & វិញ្ញាសាជ្រើសរើសចម្លើយ\n• 📑 ឯកសារសិក្សា សង្ខេបមេរៀន & ត្រៀមអាហារូបករណ៍\n\n✨ ទាញយកជា PDF ភ្លាមៗ ឬ កម្មង់សៀវភៅព្រីនដឹកជូនដល់ផ្ទះ!\n🎟️ បញ្ចុះតម្លៃ 10% ភ្លាមៗ ដោយប្រើ Coupon: WELCOME10\n\n👇 សូមចុចលើ Menu [🛒 ទិញសៀវភៅ] ខាងក្រោមដើម្បីចាប់ផ្តើម៖',
   postPurchaseInstructions: '✨ សូមអរគុណចំពោះការគាំទ្រការអាន និងការរៀនសូត្រ!\n📄 សម្រាប់សៀវភៅ PDF៖ លោកអ្នកអាចចុច Link ទាញយកអានបានភ្លាមៗ។\n📖 សម្រាប់សៀវភៅព្រីន៖ ក្រុមការងារនឹងផ្ញើជូនតាមសេវាដឹកជញ្ជូនរហ័ស 24-48 ម៉ោង។ ប្រសិនបើមានចម្ងល់ សូមទាក់ទងមកកាន់ Admin តាមរយៈប៊ូតុងជំនួយ។',
