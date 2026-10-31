@@ -31,6 +31,17 @@ async function createServer() {
     });
   });
 
+  // Explicit 404 handler for any unhandled /api/* route to prevent Vite SPA HTML fallback
+  app.all('/api/*', (req, res) => {
+    res.status(404).json({ error: `API route not found: ${req.method} ${req.url}` });
+  });
+
+  // Global JSON error handler for /api
+  app.use('/api', (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('[API Error]:', err);
+    res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+  });
+
   // Start background workers for payment checking & stock cleanup
   TelegramBotService.startBackgroundWorkers();
 

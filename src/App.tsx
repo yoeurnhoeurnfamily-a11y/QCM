@@ -69,8 +69,10 @@ export default function App() {
       setSettings(settingsData);
       setErrorMessage(null);
     } catch (err: any) {
-      console.error('Error fetching store data:', err);
-      if (!quiet) setErrorMessage('មិនអាចទាញយកទិន្នន័យពី Server បានទេ។ សូមពិនិត្យដំណើរការ Server។');
+      if (!quiet) {
+        console.warn('Initial store data load pending:', err?.message || err);
+        setErrorMessage('កំពុងភ្ជាប់ទៅកាន់ Server... សូមរង់ចាំបន្តិច ឬចុច Reload');
+      }
     } finally {
       if (!quiet) setIsRefreshing(false);
     }
