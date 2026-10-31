@@ -1,0 +1,8 @@
+{
+  "name": "Digital Store & Admin",
+  "description": "Full-stack Telegram Bookstore Bot for PDF & Printed Books with CutLuy KHQR automated payments, 24/7 Serverless Webhook, live stock reservation, interactive Telegram simulator, and administrative dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

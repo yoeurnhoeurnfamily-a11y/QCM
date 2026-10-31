@@ -1,0 +1,1779 @@
+{
+  "products": [
+    {
+      "id": "prod_pre_01",
+      "name": "QCM មតេយ្យសិក្សា",
+      "category": "👶 ឈុតគ្រូមតេយ្យសិក្សា (Preschool QCM)",
+      "bookFormat": "pdf",
+      "author": "គណៈកម្មការបណ្តុះបណ្តាលគ្រូមតេយ្យ",
+      "pages": 220,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pre_01.pdf",
+      "description": "កម្រងសំណួរជ្រើសរើសចម្លើយ QCM ជំនាញមតេយ្យសិក្សា គ្របដណ្តប់លើការអភិវឌ្ឍកុមារ ការរៀបចំសកម្មភាពល្បែងសិក្សា និងចិត្តវិទ្យាកុមារតូច។",
+      "price": 2.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.13
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 1.88
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "👶 មតេយ្យ QCM",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_pre_02",
+      "name": "គន្លឹះប្រឡងគ្រូមតេយ្យ",
+      "category": "👶 ឈុតគ្រូមតេយ្យសិក្សា (Preschool QCM)",
+      "bookFormat": "pdf",
+      "author": "សាស្ត្រាចារ្យគរុកោសល្យមតេយ្យ",
+      "pages": 185,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pre_02.pdf",
+      "description": "បូកសរុបគន្លឹះ តិចនិកធ្វើវិញ្ញាសា QCM ឱ្យបានលឿន និងត្រឹមត្រូវ ព្រមទាំងបទពិសោធន៍ប្រឡងជាប់របស់គ្រូមតេយ្យឆ្នើម។",
+      "price": 2.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.13
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 1.88
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "👶 គន្លឹះមតេយ្យ",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_pre_03",
+      "name": "សំណួរកុមារភាព QCM",
+      "category": "👶 ឈុតគ្រូមតេយ្យសិក្សា (Preschool QCM)",
+      "bookFormat": "pdf",
+      "author": "ក្រុមស្រាវជ្រាវចិត្តវិទ្យាកុមារ",
+      "pages": 205,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pre_03.pdf",
+      "description": "កម្រងសំណួរ QCM ស្តីពីការលូតលាស់រាងកាយ បញ្ញា ស្មារតី សង្គម និងអារម្មណ៍របស់កុមារតូច សម្រាប់ត្រៀមប្រឡងគ្រូមតេយ្យ។",
+      "price": 2.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.13
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 1.88
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "👶 សំណួរកុមារភាព",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_pre_04",
+      "name": "គរុកោសល្យមតេយ្យ",
+      "category": "👶 ឈុតគ្រូមតេយ្យសិក្សា (Preschool QCM)",
+      "bookFormat": "pdf",
+      "author": "វិទ្យាស្ថានជាតិអប់រំ (NIE)",
+      "pages": 250,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pre_04.pdf",
+      "description": "ទ្រឹស្តី និងវិធីសាស្ត្របង្រៀនកុមារតូច គោលការណ៍រៀបចំបរិស្ថានថ្នាក់រៀន និងការគ្រប់គ្រងឥរិយាបថកុមារក្នុងសាលាមតេយ្យ។",
+      "price": 3,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.55
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.25
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "👶 គរុកោសល្យមតេយ្យ",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_pre_05",
+      "name": "វិញ្ញាសាគ្រូក្មេង QCM",
+      "category": "👶 ឈុតគ្រូមតេយ្យសិក្សា (Preschool QCM)",
+      "bookFormat": "pdf",
+      "author": "ក្រុមការងារត្រៀមប្រឡងគ្រូមតេយ្យ",
+      "pages": 240,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pre_05.pdf",
+      "description": "បណ្តុំវិញ្ញាសាប្រឡងចេញឆ្នាំចាស់ៗ និងវិញ្ញាសាគំរូ QCM ជាក់ស្តែងសម្រាប់ត្រៀមប្រឡងគ្រូមតេយ្យក្របខ័ណ្ឌរដ្ឋ។",
+      "price": 3,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.55
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.25
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "👶 វិញ្ញាសាគ្រូក្មេង",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_pri_01",
+      "name": "QCM គ្រូបឋម",
+      "category": "🎒 ឈុតគ្រូបឋមសិក្សា (Primary School QCM)",
+      "bookFormat": "pdf",
+      "author": "គណៈកម្មការបណ្តុះបណ្តាលគ្រូបឋមសិក្សា",
+      "pages": 260,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pri_01.pdf",
+      "description": "កម្រងសំណួរ QCM គ្របដណ្តប់លើចំណេះដឹងទូទៅ ភាសាខ្មែរ គណិតវិទ្យា និងវិធីសាស្ត្របង្រៀនថ្នាក់បឋមសិក្សា។",
+      "price": 2.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.13
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 1.88
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🎒 បឋម QCM",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_pri_02",
+      "name": "គន្លឹះប្រឡងបឋម",
+      "category": "🎒 ឈុតគ្រូបឋមសិក្សា (Primary School QCM)",
+      "bookFormat": "pdf",
+      "author": "សាស្ត្រាចារ្យមជ្ឈមណ្ឌលគរុកោសល្យភូមិភាគ",
+      "pages": 195,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pri_02.pdf",
+      "description": "គន្លឹះយុទ្ធសាស្ត្រ និងវិធីសាស្ត្រដោះស្រាយសំណួរ QCM គ្រូបឋមសិក្សាឱ្យបានត្រឹមត្រូវ ១០០% ក្នុងពេលកំណត់។",
+      "price": 2.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.13
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 1.88
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🎒 គន្លឹះបឋម",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_pri_03",
+      "name": "សំណួរពង្រឹងគ្រឹះ QCM",
+      "category": "🎒 ឈុតគ្រូបឋមសិក្សា (Primary School QCM)",
+      "bookFormat": "pdf",
+      "author": "ក្រុមគ្រូឧទ្ទេសជំនាញបឋមសិក្សា",
+      "pages": 280,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pri_03.pdf",
+      "description": "សំណួរពង្រឹងគ្រឹះមូលដ្ឋានរឹងមាំលើមុខវិជ្ជាភាសាខ្មែរ (អក្ខរាវិរុទ្ធ វេយ្យាករណ៍) និងគណិតវិទ្យាប្រឡងគ្រូបឋម។",
+      "price": 2.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.13
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 1.88
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🎒 ពង្រឹងគ្រឹះ QCM",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_pri_04",
+      "name": "គរុកោសល្យបឋម",
+      "category": "🎒 ឈុតគ្រូបឋមសិក្សា (Primary School QCM)",
+      "bookFormat": "pdf",
+      "author": "វិទ្យាស្ថានជាតិអប់រំ (NIE)",
+      "pages": 245,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pri_04.pdf",
+      "description": "ទ្រឹស្តីគរុកោសល្យ និងវិធីសាស្ត្របង្រៀនសម័យថ្មីដែលផ្តោតលើសិស្សជាមជ្ឈមណ្ឌល សម្រាប់ត្រៀមប្រឡងគ្រូបឋម។",
+      "price": 3,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.55
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.25
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🎒 គរុកោសល្យបឋម",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_pri_05",
+      "name": "វិញ្ញាសាបឋមសិក្សា QCM",
+      "category": "🎒 ឈុតគ្រូបឋមសិក្សា (Primary School QCM)",
+      "bookFormat": "pdf",
+      "author": "ក្រុមការងារស្រាវជ្រាវវិញ្ញាសារដ្ឋ",
+      "pages": 300,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_pri_05.pdf",
+      "description": "កម្រងវិញ្ញាសាជាក់ស្តែងនៃការប្រឡងជ្រើសរើសគ្រូបឋមសិក្សាឆ្នាំកន្លងមក ព្រមជាមួយគន្លឹះចម្លើយលម្អិត។",
+      "price": 3,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.55
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.25
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🎒 វិញ្ញាសាបឋម",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_low_01",
+      "name": "QCM អនុវិទ្យាល័យ",
+      "category": "🏫 ឈុតគ្រូអនុវិទ្យាល័យ (Lower Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "ក្រុមសាស្ត្រាចារ្យគរុកោសល្យអនុវិទ្យាល័យ",
+      "pages": 290,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_low_01.pdf",
+      "description": "កម្រងសំណួរ QCM ត្រៀមប្រឡងគ្រូបង្រៀនកម្រិតមូលដ្ឋាន (អនុវិទ្យាល័យ) គ្របដណ្តប់លើមុខវិជ្ជាទូទៅ និងឯកទេស។",
+      "price": 3,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.55
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.25
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏫 អនុវិទ្យាល័យ QCM",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_low_02",
+      "name": "គន្លឹះប្រឡងគ្រូមូលដ្ឋាន",
+      "category": "🏫 ឈុតគ្រូអនុវិទ្យាល័យ (Lower Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "គ្រូឧទ្ទេសគរុកោសល្យភូមិភាគ",
+      "pages": 210,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_low_02.pdf",
+      "description": "យុទ្ធសាស្ត្រ និងតិចនិកវិភាគសំណួរ QCM ស្មុគស្មាញ ដើម្បីទទួលបានពិន្ទុខ្ពស់ក្នុងពេលប្រឡងគ្រូមូលដ្ឋាន។",
+      "price": 3,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.55
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.25
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏫 គន្លឹះគ្រូមូលដ្ឋាន",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_low_03",
+      "name": "សំណួរកម្រិតមូលដ្ឋាន QCM",
+      "category": "🏫 ឈុតគ្រូអនុវិទ្យាល័យ (Lower Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "ក្រុមស្រាវជ្រាវមុខងារសាធារណៈ",
+      "pages": 275,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_low_03.pdf",
+      "description": "សំណួរជ្រើសរើសចម្លើយ QCM វប្បធម៌ទូទៅ ចំណេះដឹងសង្គម និងច្បាប់រដ្ឋបាល សម្រាប់ប្រឡងគ្រូមូលដ្ឋាន។",
+      "price": 3,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.55
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.25
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏫 សំណួរមូលដ្ឋាន",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_low_04",
+      "name": "វិញ្ញាសាអនុវិទ្យាល័យ QCM",
+      "category": "🏫 ឈុតគ្រូអនុវិទ្យាល័យ (Lower Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "វិទ្យាស្ថានជាតិអប់រំ (NIE)",
+      "pages": 320,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_low_04.pdf",
+      "description": "បណ្តុំវិញ្ញាសាប្រឡងក្របខ័ណ្ឌគ្រូមូលដ្ឋានអនុវិទ្យាល័យឆ្នាំមុនៗ ព្រមទាំងការបកស្រាយគន្លឹះចម្លើយយ៉ាងក្បោះក្បាយ។",
+      "price": 3.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.98
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.63
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏫 វិញ្ញាសាអនុវិទ្យាល័យ",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_low_05",
+      "name": "ជំនាញមូលដ្ឋាន QCM",
+      "category": "🏫 ឈុតគ្រូអនុវិទ្យាល័យ (Lower Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "គណៈកម្មការរៀបចំវិញ្ញាសាថ្នាក់ជាតិ",
+      "pages": 260,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_low_05.pdf",
+      "description": "សំណួរ QCM គរុកោសល្យទូទៅ ចិត្តវិទ្យាជំទង់ និងវិធីសាស្ត្រគ្រប់គ្រងថ្នាក់រៀនកម្រិតអនុវិទ្យាល័យ។",
+      "price": 3.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.98
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.63
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏫 ជំនាញមូលដ្ឋាន",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_upp_01",
+      "name": "QCM វិទ្យាល័យ",
+      "category": "🏢 ឈុតគ្រូវិទ្យាល័យ (Upper Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "សាស្ត្រាចារ្យសាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ & NIE",
+      "pages": 330,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_upp_01.pdf",
+      "description": "កម្រងសំណួរ QCM កម្រិតឧត្តមសិក្សា សម្រាប់ត្រៀមប្រឡងគ្រូវិទ្យាល័យ (NIE កម្រិត១) គ្របដណ្តប់គ្រប់ផ្នែកសំខាន់ៗ។",
+      "price": 3.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.98
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.63
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏢 វិទ្យាល័យ QCM",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_upp_02",
+      "name": "គន្លឹះប្រឡងគ្រូវិទ្យាល័យ",
+      "category": "🏢 ឈុតគ្រូវិទ្យាល័យ (Upper Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "ក្រុមនិស្សិតជ័យលាភី NIE កម្រិត១",
+      "pages": 240,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_upp_02.pdf",
+      "description": "រូបមន្តគន្លឹះ យុទ្ធសាស្ត្របំបែកសំណួរពិបាកៗ និងគន្លឹះប្រឡងជាប់ជាស្ថាពរពីសិស្សច្បងជ័យលាភី។",
+      "price": 3.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.98
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.63
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏢 គន្លឹះគ្រូវិទ្យាល័យ",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_upp_03",
+      "name": "សំណួរជឿនលឿន QCM",
+      "category": "🏢 ឈុតគ្រូវិទ្យាល័យ (Upper Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "ក្រុមស្រាវជ្រាវគរុកោសល្យជាន់ខ្ពស់",
+      "pages": 310,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_upp_03.pdf",
+      "description": "សំណួរជម្រើស QCM កម្រិតស៊ីជម្រៅ សំណួរវិភាគ និងគតិយុត្តិ សម្រាប់វាស់ស្ទង់សមត្ថភាពបញ្ញាវន្ត។",
+      "price": 3.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.98
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.63
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏢 សំណួរជឿនលឿន",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_upp_04",
+      "name": "វិញ្ញាសាបាក់ឌុប QCM",
+      "category": "🏢 ឈុតគ្រូវិទ្យាល័យ (Upper Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "គណៈកម្មការរៀបចំការប្រឡងបាក់ឌុបជាតិ",
+      "pages": 360,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_upp_04.pdf",
+      "description": "កម្រងវិញ្ញាសាស្ដង់ដារបាក់ឌុបថ្នាក់ជាតិ និងវិញ្ញាសាប្រឡងចេញគ្រូវិទ្យាល័យ គណិត រូប គីមី ជីវ អក្សរសាស្ត្រ។",
+      "price": 4,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 3.4
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 3
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏢 វិញ្ញាសាបាក់ឌុប QCM",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_upp_05",
+      "name": "ជំនាញឯកទេស QCM",
+      "category": "🏢 ឈុតគ្រូវិទ្យាល័យ (Upper Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "សាស្ត្រាចារ្យឯកទេស NIE",
+      "pages": 380,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_upp_05.pdf",
+      "description": "កម្រងសំណួរ QCM គរុកោសល្យឯកទេស វិធីសាស្ត្របង្រៀនទំនើបតាមបែប STEM និងការវាយតម្លៃលទ្ធផលសិក្សា។",
+      "price": 4,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 3.4
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 3
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏢 ជំនាញឯកទេស",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    }
+  ],
+  "stock": [
+    {
+      "id": "stk_prod_pre_01_1",
+      "productId": "prod_pre_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_01.pdf?access_key=kh_qcm_prod_pre_01_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_01_2",
+      "productId": "prod_pre_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_01.pdf?access_key=kh_qcm_prod_pre_01_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_01_3",
+      "productId": "prod_pre_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_01.pdf?access_key=kh_qcm_prod_pre_01_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_01_4",
+      "productId": "prod_pre_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_01.pdf?access_key=kh_qcm_prod_pre_01_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_01_5",
+      "productId": "prod_pre_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_01.pdf?access_key=kh_qcm_prod_pre_01_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_02_1",
+      "productId": "prod_pre_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_02.pdf?access_key=kh_qcm_prod_pre_02_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_02_2",
+      "productId": "prod_pre_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_02.pdf?access_key=kh_qcm_prod_pre_02_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_02_3",
+      "productId": "prod_pre_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_02.pdf?access_key=kh_qcm_prod_pre_02_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_02_4",
+      "productId": "prod_pre_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_02.pdf?access_key=kh_qcm_prod_pre_02_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_02_5",
+      "productId": "prod_pre_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_02.pdf?access_key=kh_qcm_prod_pre_02_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_03_1",
+      "productId": "prod_pre_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_03.pdf?access_key=kh_qcm_prod_pre_03_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_03_2",
+      "productId": "prod_pre_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_03.pdf?access_key=kh_qcm_prod_pre_03_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_03_3",
+      "productId": "prod_pre_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_03.pdf?access_key=kh_qcm_prod_pre_03_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_03_4",
+      "productId": "prod_pre_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_03.pdf?access_key=kh_qcm_prod_pre_03_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_03_5",
+      "productId": "prod_pre_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_03.pdf?access_key=kh_qcm_prod_pre_03_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_04_1",
+      "productId": "prod_pre_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_04.pdf?access_key=kh_qcm_prod_pre_04_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_04_2",
+      "productId": "prod_pre_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_04.pdf?access_key=kh_qcm_prod_pre_04_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_04_3",
+      "productId": "prod_pre_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_04.pdf?access_key=kh_qcm_prod_pre_04_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_04_4",
+      "productId": "prod_pre_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_04.pdf?access_key=kh_qcm_prod_pre_04_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_04_5",
+      "productId": "prod_pre_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_04.pdf?access_key=kh_qcm_prod_pre_04_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_05_1",
+      "productId": "prod_pre_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_05.pdf?access_key=kh_qcm_prod_pre_05_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_05_2",
+      "productId": "prod_pre_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_05.pdf?access_key=kh_qcm_prod_pre_05_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_05_3",
+      "productId": "prod_pre_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_05.pdf?access_key=kh_qcm_prod_pre_05_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_05_4",
+      "productId": "prod_pre_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_05.pdf?access_key=kh_qcm_prod_pre_05_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pre_05_5",
+      "productId": "prod_pre_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pre_05.pdf?access_key=kh_qcm_prod_pre_05_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_01_1",
+      "productId": "prod_pri_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_01.pdf?access_key=kh_qcm_prod_pri_01_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_01_2",
+      "productId": "prod_pri_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_01.pdf?access_key=kh_qcm_prod_pri_01_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_01_3",
+      "productId": "prod_pri_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_01.pdf?access_key=kh_qcm_prod_pri_01_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_01_4",
+      "productId": "prod_pri_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_01.pdf?access_key=kh_qcm_prod_pri_01_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_01_5",
+      "productId": "prod_pri_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_01.pdf?access_key=kh_qcm_prod_pri_01_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_02_1",
+      "productId": "prod_pri_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_02.pdf?access_key=kh_qcm_prod_pri_02_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_02_2",
+      "productId": "prod_pri_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_02.pdf?access_key=kh_qcm_prod_pri_02_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_02_3",
+      "productId": "prod_pri_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_02.pdf?access_key=kh_qcm_prod_pri_02_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_02_4",
+      "productId": "prod_pri_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_02.pdf?access_key=kh_qcm_prod_pri_02_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_02_5",
+      "productId": "prod_pri_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_02.pdf?access_key=kh_qcm_prod_pri_02_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_03_1",
+      "productId": "prod_pri_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_03.pdf?access_key=kh_qcm_prod_pri_03_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_03_2",
+      "productId": "prod_pri_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_03.pdf?access_key=kh_qcm_prod_pri_03_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_03_3",
+      "productId": "prod_pri_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_03.pdf?access_key=kh_qcm_prod_pri_03_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_03_4",
+      "productId": "prod_pri_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_03.pdf?access_key=kh_qcm_prod_pri_03_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_03_5",
+      "productId": "prod_pri_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_03.pdf?access_key=kh_qcm_prod_pri_03_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_04_1",
+      "productId": "prod_pri_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_04.pdf?access_key=kh_qcm_prod_pri_04_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_04_2",
+      "productId": "prod_pri_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_04.pdf?access_key=kh_qcm_prod_pri_04_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_04_3",
+      "productId": "prod_pri_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_04.pdf?access_key=kh_qcm_prod_pri_04_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_04_4",
+      "productId": "prod_pri_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_04.pdf?access_key=kh_qcm_prod_pri_04_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_04_5",
+      "productId": "prod_pri_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_04.pdf?access_key=kh_qcm_prod_pri_04_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_05_1",
+      "productId": "prod_pri_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_05.pdf?access_key=kh_qcm_prod_pri_05_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_05_2",
+      "productId": "prod_pri_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_05.pdf?access_key=kh_qcm_prod_pri_05_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_05_3",
+      "productId": "prod_pri_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_05.pdf?access_key=kh_qcm_prod_pri_05_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_05_4",
+      "productId": "prod_pri_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_05.pdf?access_key=kh_qcm_prod_pri_05_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_pri_05_5",
+      "productId": "prod_pri_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_pri_05.pdf?access_key=kh_qcm_prod_pri_05_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_01_1",
+      "productId": "prod_low_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_01.pdf?access_key=kh_qcm_prod_low_01_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_01_2",
+      "productId": "prod_low_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_01.pdf?access_key=kh_qcm_prod_low_01_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_01_3",
+      "productId": "prod_low_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_01.pdf?access_key=kh_qcm_prod_low_01_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_01_4",
+      "productId": "prod_low_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_01.pdf?access_key=kh_qcm_prod_low_01_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_01_5",
+      "productId": "prod_low_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_01.pdf?access_key=kh_qcm_prod_low_01_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_02_1",
+      "productId": "prod_low_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_02.pdf?access_key=kh_qcm_prod_low_02_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_02_2",
+      "productId": "prod_low_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_02.pdf?access_key=kh_qcm_prod_low_02_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_02_3",
+      "productId": "prod_low_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_02.pdf?access_key=kh_qcm_prod_low_02_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_02_4",
+      "productId": "prod_low_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_02.pdf?access_key=kh_qcm_prod_low_02_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_02_5",
+      "productId": "prod_low_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_02.pdf?access_key=kh_qcm_prod_low_02_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_03_1",
+      "productId": "prod_low_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_03.pdf?access_key=kh_qcm_prod_low_03_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_03_2",
+      "productId": "prod_low_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_03.pdf?access_key=kh_qcm_prod_low_03_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_03_3",
+      "productId": "prod_low_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_03.pdf?access_key=kh_qcm_prod_low_03_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_03_4",
+      "productId": "prod_low_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_03.pdf?access_key=kh_qcm_prod_low_03_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_03_5",
+      "productId": "prod_low_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_03.pdf?access_key=kh_qcm_prod_low_03_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_04_1",
+      "productId": "prod_low_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_04.pdf?access_key=kh_qcm_prod_low_04_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_04_2",
+      "productId": "prod_low_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_04.pdf?access_key=kh_qcm_prod_low_04_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_04_3",
+      "productId": "prod_low_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_04.pdf?access_key=kh_qcm_prod_low_04_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_04_4",
+      "productId": "prod_low_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_04.pdf?access_key=kh_qcm_prod_low_04_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_04_5",
+      "productId": "prod_low_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_04.pdf?access_key=kh_qcm_prod_low_04_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_05_1",
+      "productId": "prod_low_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_05.pdf?access_key=kh_qcm_prod_low_05_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_05_2",
+      "productId": "prod_low_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_05.pdf?access_key=kh_qcm_prod_low_05_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_05_3",
+      "productId": "prod_low_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_05.pdf?access_key=kh_qcm_prod_low_05_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_05_4",
+      "productId": "prod_low_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_05.pdf?access_key=kh_qcm_prod_low_05_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_low_05_5",
+      "productId": "prod_low_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_low_05.pdf?access_key=kh_qcm_prod_low_05_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_01_1",
+      "productId": "prod_upp_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_01.pdf?access_key=kh_qcm_prod_upp_01_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_01_2",
+      "productId": "prod_upp_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_01.pdf?access_key=kh_qcm_prod_upp_01_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_01_3",
+      "productId": "prod_upp_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_01.pdf?access_key=kh_qcm_prod_upp_01_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_01_4",
+      "productId": "prod_upp_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_01.pdf?access_key=kh_qcm_prod_upp_01_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_01_5",
+      "productId": "prod_upp_01",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_01.pdf?access_key=kh_qcm_prod_upp_01_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_02_1",
+      "productId": "prod_upp_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_02.pdf?access_key=kh_qcm_prod_upp_02_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_02_2",
+      "productId": "prod_upp_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_02.pdf?access_key=kh_qcm_prod_upp_02_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_02_3",
+      "productId": "prod_upp_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_02.pdf?access_key=kh_qcm_prod_upp_02_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_02_4",
+      "productId": "prod_upp_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_02.pdf?access_key=kh_qcm_prod_upp_02_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_02_5",
+      "productId": "prod_upp_02",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_02.pdf?access_key=kh_qcm_prod_upp_02_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_03_1",
+      "productId": "prod_upp_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_03.pdf?access_key=kh_qcm_prod_upp_03_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_03_2",
+      "productId": "prod_upp_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_03.pdf?access_key=kh_qcm_prod_upp_03_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_03_3",
+      "productId": "prod_upp_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_03.pdf?access_key=kh_qcm_prod_upp_03_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_03_4",
+      "productId": "prod_upp_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_03.pdf?access_key=kh_qcm_prod_upp_03_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_03_5",
+      "productId": "prod_upp_03",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_03.pdf?access_key=kh_qcm_prod_upp_03_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_04_1",
+      "productId": "prod_upp_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_04.pdf?access_key=kh_qcm_prod_upp_04_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_04_2",
+      "productId": "prod_upp_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_04.pdf?access_key=kh_qcm_prod_upp_04_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_04_3",
+      "productId": "prod_upp_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_04.pdf?access_key=kh_qcm_prod_upp_04_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_04_4",
+      "productId": "prod_upp_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_04.pdf?access_key=kh_qcm_prod_upp_04_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_04_5",
+      "productId": "prod_upp_04",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_04.pdf?access_key=kh_qcm_prod_upp_04_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_05_1",
+      "productId": "prod_upp_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_05.pdf?access_key=kh_qcm_prod_upp_05_token_1001",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_05_2",
+      "productId": "prod_upp_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_05.pdf?access_key=kh_qcm_prod_upp_05_token_1002",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_05_3",
+      "productId": "prod_upp_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_05.pdf?access_key=kh_qcm_prod_upp_05_token_1003",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_05_4",
+      "productId": "prod_upp_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_05.pdf?access_key=kh_qcm_prod_upp_05_token_1004",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    },
+    {
+      "id": "stk_prod_upp_05_5",
+      "productId": "prod_upp_05",
+      "content": "https://khbookstore.com/dl/pdf_prod_upp_05.pdf?access_key=kh_qcm_prod_upp_05_token_1005",
+      "status": "available",
+      "reservedUntil": null,
+      "orderId": null,
+      "addedAt": "2026-10-30T12:27:52.677Z",
+      "soldAt": null
+    }
+  ],
+  "customers": [
+    {
+      "id": "cust_8801",
+      "telegramId": 58829104,
+      "username": "sokha_reader",
+      "firstName": "Sokha",
+      "lastName": "Chheng",
+      "joinedAt": "2026-10-15T04:37:40.381Z",
+      "totalOrders": 3,
+      "totalSpent": 12.5,
+      "referredBy": null,
+      "referralCode": "ref_58829104",
+      "walletBalance": 0.6,
+      "phone": "012 889 900",
+      "defaultShippingAddress": "ផ្ទះលេខ 45 ផ្លូវ 271 សង្កាត់បឹងទំពុន ខណ្ឌមានជ័យ ភ្នំពេញ"
+    },
+    {
+      "id": "cust_8802",
+      "telegramId": 92837192,
+      "username": "dara_reader",
+      "firstName": "Dara",
+      "lastName": "Vannak",
+      "joinedAt": "2026-10-22T04:37:40.381Z",
+      "totalOrders": 2,
+      "totalSpent": 14.5,
+      "referredBy": "58829104",
+      "referralCode": "ref_92837192",
+      "walletBalance": 0.4,
+      "phone": "098 776 543",
+      "defaultShippingAddress": "បុរីពិភពថ្មីចំការដូង ផ្លូវលេខ 3 ផ្ទះ 12 ភ្នំពេញ"
+    },
+    {
+      "id": "cust_8803",
+      "telegramId": 77291038,
+      "username": "rith_books",
+      "firstName": "Rith",
+      "joinedAt": "2026-10-27T04:37:40.381Z",
+      "totalOrders": 1,
+      "totalSpent": 8,
+      "referredBy": "58829104",
+      "referralCode": "ref_77291038",
+      "walletBalance": 0,
+      "phone": "077 123 456",
+      "defaultShippingAddress": "ភូមិវត្តបូព៌ សង្កាត់សាលាកំរើក ក្រុងសៀមរាប ខេត្តសៀមរាប"
+    },
+    {
+      "id": "cust_1793284003959_892",
+      "telegramId": 10001,
+      "username": "teacher_sokha",
+      "firstName": "Sokha",
+      "joinedAt": "2026-10-29T14:26:43.959Z",
+      "totalOrders": 0,
+      "totalSpent": 0,
+      "referredBy": null,
+      "referralCode": "ref_10001",
+      "walletBalance": 0
+    },
+    {
+      "id": "cust_1793449405642_282",
+      "telegramId": 7104206306,
+      "username": "",
+      "firstName": "ឆន",
+      "lastName": "មិនា",
+      "joinedAt": "2026-10-31T12:23:25.642Z",
+      "totalOrders": 0,
+      "totalSpent": 0,
+      "referredBy": null,
+      "referralCode": "ref_7104206306",
+      "walletBalance": 0,
+      "isBlocked": true,
+      "botBlockedAt": "2026-10-31T12:24:55.181Z"
+    },
+    {
+      "id": "cust_1793449628459_252",
+      "telegramId": 887969513,
+      "username": "",
+      "firstName": "NY",
+      "lastName": "RANY",
+      "joinedAt": "2026-10-31T12:27:08.459Z",
+      "totalOrders": 0,
+      "totalSpent": 0,
+      "referredBy": null,
+      "referralCode": "ref_887969513",
+      "walletBalance": 0,
+      "isBlocked": false
+    }
+  ],
+  "orders": [
+    {
+      "id": "ORD-781920",
+      "referenceId": "ORD-781920",
+      "telegramId": "58829104",
+      "telegramUsername": "sokha_reader",
+      "customerName": "Sokha Chheng",
+      "productId": "prod_bacii_01",
+      "productName": "សៀវភៅ វិញ្ញាសាត្រៀមប្រឡងបាក់ឌុប BacII ២០២៦ & គន្លឹះដោះស្រាយ (PDF)",
+      "quantity": 1,
+      "unitPrice": 3.5,
+      "subtotal": 3.5,
+      "discountAmount": 0,
+      "couponCode": null,
+      "totalAmount": 3.5,
+      "status": "completed",
+      "paymentProvider": "cutluy",
+      "cutluyPaymentId": "pay_sim_001",
+      "checkoutUrl": null,
+      "qrString": "00020101021229300016cutluy.khqr.mock5802KH530384054043.50",
+      "expiresAt": "2026-10-26T04:37:40.381Z",
+      "deliveredItems": [
+        "https://khbookstore.com/dl/pdf_bacii_2026_exam_prep.pdf?token=kh_bk_bac_delivered_01"
+      ],
+      "referralTelegramId": null,
+      "commissionEarned": 0,
+      "createdAt": "2026-10-26T04:37:40.381Z",
+      "completedAt": "2026-10-26T04:38:25.381Z",
+      "bookFormat": "pdf",
+      "pdfDownloadUrl": "https://khbookstore.com/dl/pdf_bacii_2026_exam_prep.pdf?token=kh_bk_bac_delivered_01"
+    },
+    {
+      "id": "ORD-892104",
+      "referenceId": "ORD-892104",
+      "telegramId": "92837192",
+      "telegramUsername": "dara_reader",
+      "customerName": "Dara Vannak",
+      "productId": "prod_teacher_qcm_03",
+      "productName": "កម្រងសំណួរ QCM គរុកោសល្យ & វិធីសាស្ត្របង្រៀន ត្រៀមប្រឡងគ្រូ (សៀវភៅព្រីន)",
+      "quantity": 1,
+      "unitPrice": 7.5,
+      "subtotal": 7.5,
+      "discountAmount": 0,
+      "couponCode": null,
+      "totalAmount": 7.5,
+      "status": "completed",
+      "paymentProvider": "cutluy",
+      "cutluyPaymentId": "pay_sim_002",
+      "checkoutUrl": null,
+      "qrString": "00020101021229300016cutluy.khqr.mock5802KH530384054047.50",
+      "expiresAt": "2026-10-28T04:37:40.381Z",
+      "deliveredItems": [
+        "ISBN-978-9924-NIE-TCH-001 | ឃ្លាំងភ្នំពេញ ធ្នើ A2 | ក្បាលទី 1"
+      ],
+      "referralTelegramId": "58829104",
+      "commissionEarned": 0.2,
+      "createdAt": "2026-10-28T04:37:40.381Z",
+      "completedAt": "2026-10-28T04:38:18.381Z",
+      "bookFormat": "printed",
+      "shippingRecipient": "Dara Vannak",
+      "shippingPhone": "098 776 543",
+      "shippingAddress": "បុរីពិភពថ្មីចំការដូង ផ្លូវលេខ 3 ផ្ទះ 12 ភ្នំពេញ",
+      "shippingStatus": "shipped",
+      "trackingNumber": "VET-PHN-88291"
+    }
+  ],
+  "coupons": [
+    {
+      "id": "cpn_01",
+      "code": "WELCOME10",
+      "type": "percentage",
+      "value": 10,
+      "minOrderAmount": 2,
+      "maxUses": 100,
+      "usedCount": 8,
+      "expiresAt": "2026-12-28T04:37:40.381Z",
+      "isActive": true
+    },
+    {
+      "id": "cpn_02",
+      "code": "READBOOK1",
+      "type": "fixed",
+      "value": 1,
+      "minOrderAmount": 5,
+      "maxUses": 50,
+      "usedCount": 14,
+      "expiresAt": "2026-11-28T04:37:40.381Z",
+      "isActive": true
+    }
+  ],
+  "settings": {
+    "botToken": "9128630112:AAG71Vdgs1HCVtREOt34dT4ofeBQBMkxrYc",
+    "botUsername": "qcmstore_bot",
+    "channelId": "",
+    "supportUsername": "kh_bookstore_support",
+    "welcomeMessage": "សូមស្វាគមន៍មកកាន់ បណ្ណាគារសៀវភៅត្រៀមប្រឡង & QCM KH Store! 📚🎓\n\nយើងខ្ញុំមានផ្គត់ផ្គង់៖\n• 📘 សៀវភៅត្រៀមប្រឡងបាក់ឌុប & ក្របខ័ណ្ឌរដ្ឋ\n• 📝 កម្រងសំណួរ QCM & វិញ្ញាសាជ្រើសរើសចម្លើយ\n• 📑 ឯកសារសិក្សា សង្ខេបមេរៀន & ត្រៀមអាហារូបករណ៍\n\n✨ ទាញយកជា PDF ភ្លាមៗ ឬ កម្មង់សៀវភៅព្រីនដឹកជូនដល់ផ្ទះ!\n🎟️ បញ្ចុះតម្លៃ 10% ភ្លាមៗ ដោយប្រើ Coupon: WELCOME10\n\n👇 សូមចុចលើ Menu [🛒 ទិញសៀវភៅ] ខាងក្រោមដើម្បីចាប់ផ្តើម៖",
+    "postPurchaseInstructions": "✨ សូមអរគុណចំពោះការគាំទ្រការអាន និងការរៀនសូត្រ!\n📄 សម្រាប់សៀវភៅ PDF៖ លោកអ្នកអាចចុច Link ទាញយកអានបានភ្លាមៗ។\n📖 សម្រាប់សៀវភៅព្រីន៖ ក្រុមការងារនឹងផ្ញើជូនតាមសេវាដឹកជញ្ជូនរហ័ស 24-48 ម៉ោង។ ប្រសិនបើមានចម្ងល់ សូមទាក់ទងមកកាន់ Admin តាមរយៈប៊ូតុងជំនួយ។",
+    "cutluyApiKey": "",
+    "qrExpiryMinutes": 5,
+    "referralEnabled": true,
+    "referralCommissionPerAccount": 0.2,
+    "alertAdminOnNewStock": true,
+    "broadcastOnNewStock": false,
+    "stockDepletedPolicyMessage": "⚠️ សូមអភ័យទោស! ស្តុកសៀវភៅត្រូវបានលក់អស់ក្នុងពេលដំណាលគ្នា។ សូមទាក់ទង Admin ដើម្បីទទួលបានការបញ្ចូលស្តុក ឬសងប្រាក់វិញភ្លាមៗ។",
+    "isPollingActive": true
+  }
+}
