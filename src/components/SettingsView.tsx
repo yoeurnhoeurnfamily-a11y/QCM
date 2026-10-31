@@ -22,7 +22,8 @@ import {
   Zap,
   Globe,
   Radio,
-  Server
+  Server,
+  Truck
 } from 'lucide-react';
 import { api } from '../services/api';
 import type { BotSettings, BackupRecord } from '../types/store';
@@ -706,6 +707,77 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <p className="text-[10px] text-slate-500 mt-1">
                 លំនាំដើម 5 នាទី (ផុតកំណត់នឹងដោះលែងស្តុកមកវិញ)
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION: Shipping Fees & Currency Exchange */}
+        <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-5 space-y-4">
+          <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+            <Truck className="w-4 h-4 text-cyan-400" />
+            <h4 className="font-bold text-white">សេវាដឹកជញ្ជូន & អត្រាប្តូរប្រាក់រៀល (Shipping & Dual Currency)</h4>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-slate-300 font-medium mb-1 text-xs">
+                ថ្លៃដឹកជញ្ជូន ភ្នំពេញ ($)
+              </label>
+              <input
+                type="number"
+                step="0.05"
+                min="0"
+                value={formData.shippingFeePhnomPenh ?? 1.25}
+                onChange={(e) => handleChange('shippingFeePhnomPenh', parseFloat(e.target.value) || 0)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-cyan-500"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">លំនាំដើម $1.25 ក្នុងរាជធានីភ្នំពេញ</p>
+            </div>
+
+            <div>
+              <label className="block text-slate-300 font-medium mb-1 text-xs">
+                ថ្លៃដឹកជញ្ជូន តាមខេត្ត ($)
+              </label>
+              <input
+                type="number"
+                step="0.05"
+                min="0"
+                value={formData.shippingFeeProvince ?? 1.75}
+                onChange={(e) => handleChange('shippingFeeProvince', parseFloat(e.target.value) || 0)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-cyan-500"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">ផ្ញើតាម VET Express / J&T Express ($1.75)</p>
+            </div>
+
+            <div>
+              <label className="block text-slate-300 font-medium mb-1 text-xs">
+                កម្រិត Free Delivery ($)
+              </label>
+              <input
+                type="number"
+                step="1"
+                min="0"
+                value={formData.freeShippingThreshold ?? 15.0}
+                onChange={(e) => handleChange('freeShippingThreshold', parseFloat(e.target.value) || 0)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-cyan-500"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">ទិញចាប់ពី $15 ឡើងទៅ ដឹកជញ្ជូនឥតគិតថ្លៃ</p>
+            </div>
+
+            <div>
+              <label className="block text-slate-300 font-medium mb-1 text-xs">
+                អត្រាប្តូរប្រាក់ KHR ($1 = ? ៛)
+              </label>
+              <input
+                type="number"
+                step="10"
+                min="3000"
+                max="5000"
+                value={formData.khrExchangeRate ?? 4100}
+                onChange={(e) => handleChange('khrExchangeRate', parseInt(e.target.value, 10) || 4100)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-cyan-500"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">បង្ហាញតម្លៃគួបផ្សំ USD និង KHR (រៀល)</p>
             </div>
           </div>
         </div>

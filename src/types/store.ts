@@ -128,6 +128,10 @@ export interface Order {
   shippingPhone?: string;
   shippingAddress?: string;
   shippingStatus?: 'pending' | 'preparing' | 'shipped' | 'delivered';
+  shippingFee?: number;
+  totalAmountKhr?: number;
+  items?: Array<{ productId: string; productName: string; quantity: number; unitPrice: number; bookFormat?: string }>;
+  receiptDataUrl?: string;
   trackingNumber?: string;
   pdfDownloadUrl?: string;
   paymentSlipUrl?: string | null;
@@ -168,6 +172,10 @@ export interface BotSettings {
   broadcastOnNewStock: boolean;
   stockDepletedPolicyMessage: string;
   isPollingActive: boolean;
+  shippingFeePhnomPenh?: number;
+  shippingFeeProvince?: number;
+  freeShippingThreshold?: number;
+  khrExchangeRate?: number;
   webhookUrl?: string;
   webhookEnabled?: boolean;
   webhookSecretToken?: string;

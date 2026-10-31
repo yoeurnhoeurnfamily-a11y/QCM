@@ -1639,6 +1639,20 @@
       "referredBy": null,
       "referralCode": "ref_10001",
       "walletBalance": 0
+    },
+    {
+      "id": "cust_1793454043488_557",
+      "telegramId": 6277908085,
+      "username": "yoeurnhoeurn",
+      "firstName": "YOEURN",
+      "lastName": "hoeurn",
+      "joinedAt": "2026-10-31T13:40:43.488Z",
+      "totalOrders": 0,
+      "totalSpent": 0,
+      "referredBy": null,
+      "referralCode": "ref_6277908085",
+      "walletBalance": 0,
+      "isBlocked": false
     }
   ],
   "orders": [
@@ -1737,7 +1751,7 @@
     "channelId": "",
     "adminTelegramId": "",
     "adminGroupId": "",
-    "supportUsername": "kh_bookstore_support",
+    "supportUsername": "yoeurnhoeurn",
     "welcomeMessage": "សូមស្វាគមន៍មកកាន់ បណ្ណាគារសៀវភៅត្រៀមប្រឡង & QCM KH Store! 📚🎓\n\nយើងខ្ញុំមានផ្គត់ផ្គង់៖\n• 📘 សៀវភៅត្រៀមប្រឡងបាក់ឌុប & ក្របខ័ណ្ឌរដ្ឋ\n• 📝 កម្រងសំណួរ QCM & វិញ្ញាសាជ្រើសរើសចម្លើយ\n• 📑 ឯកសារសិក្សា សង្ខេបមេរៀន & ត្រៀមអាហារូបករណ៍\n\n✨ ទាញយកជា PDF ភ្លាមៗ ឬ កម្មង់សៀវភៅព្រីនដឹកជូនដល់ផ្ទះ!\n🎟️ បញ្ចុះតម្លៃ 10% ភ្លាមៗ ដោយប្រើ Coupon: WELCOME10\n\n👇 សូមចុចលើ Menu [🛒 ទិញសៀវភៅ] ខាងក្រោមដើម្បីចាប់ផ្តើម៖",
     "postPurchaseInstructions": "✨ សូមអរគុណចំពោះការគាំទ្រការអាន និងការរៀនសូត្រ!\n📄 សម្រាប់សៀវភៅ PDF៖ លោកអ្នកអាចចុច Link ទាញយកអានបានភ្លាមៗ។\n📖 សម្រាប់សៀវភៅព្រីន៖ ក្រុមការងារនឹងផ្ញើជូនតាមសេវាដឹកជញ្ជូនរហ័ស 24-48 ម៉ោង។ ប្រសិនបើមានចម្ងល់ សូមទាក់ទងមកកាន់ Admin តាមរយៈប៊ូតុងជំនួយ។",
     "cutluyApiKey": "",
@@ -1747,6 +1761,7 @@
     "alertAdminOnNewStock": true,
     "broadcastOnNewStock": false,
     "stockDepletedPolicyMessage": "⚠️ សូមអភ័យទោស! ស្តុកសៀវភៅត្រូវបានលក់អស់ក្នុងពេលដំណាលគ្នា។ សូមទាក់ទង Admin ដើម្បីទទួលបានការបញ្ចូលស្តុក ឬសងប្រាក់វិញភ្លាមៗ។",
-    "isPollingActive": true
+    "isPollingActive": true,
+    "supportPhone": "087301610"
   }
 }

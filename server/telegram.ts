@@ -35,6 +35,19 @@ export function calculateOrderPrice(product: Product, qty: number): { unitPrice:
   };
 }
 
+// Cambodian phone number validator (01x, 06x, 07x, 08x, 09x - 9 to 10 digits)
+export function isValidCambodianPhone(phone: string): boolean {
+  if (!phone) return false;
+  const cleaned = phone.replace(/[\s\-\(\)\.]/g, '');
+  return /^0[1-9]\d{7,8}$/.test(cleaned);
+}
+
+// Format dual currency string (USD & KHR)
+export function formatDualPrice(usd: number, exchangeRate = 4100): string {
+  const khr = Math.round(usd * exchangeRate);
+  return `$${usd.toFixed(2)} USD (≈ ${khr.toLocaleString()} ៛)`;
+}
+
 export class TelegramBotService {
   private static isRunning = false;
   private static pollOffset = 0;
@@ -61,15 +74,58 @@ export class TelegramBotService {
   // Session / conversation state for multi-step prompts (e.g., Hardcopy shipping address)
   private static customerStates: Map<string, { step: string; data: any }> = new Map();
 
+  // In-memory Cart System: user chatId -> array of items
+  private static userCarts: Map<string, Array<{ productId: string; qty: number }>> = new Map();
+
+  public static getCart(chatId: string | number): Array<{ productId: string; qty: number }> {
+    const key = String(chatId);
+    if (!this.userCarts.has(key)) {
+      this.userCarts.set(key, []);
+    }
+    return this.userCarts.get(key)!;
+  }
+
+  public static addToCart(chatId: string | number, productId: string, qty = 1): number {
+    const cart = this.getCart(chatId);
+    const existing = cart.find(i => i.productId === productId);
+    if (existing) {
+      existing.qty += qty;
+    } else {
+      cart.push({ productId, qty });
+    }
+    return cart.reduce((sum, item) => sum + item.qty, 0);
+  }
+
+  public static updateCartQty(chatId: string | number, productId: string, delta: number): void {
+    const cart = this.getCart(chatId);
+    const existing = cart.find(i => i.productId === productId);
+    if (existing) {
+      existing.qty += delta;
+      if (existing.qty <= 0) {
+        this.removeFromCart(chatId, productId);
+      }
+    }
+  }
+
+  public static removeFromCart(chatId: string | number, productId: string): void {
+    const key = String(chatId);
+    const filtered = this.getCart(key).filter(i => i.productId !== productId);
+    this.userCarts.set(key, filtered);
+  }
+
+  public static clearCart(chatId: string | number): void {
+    this.userCarts.set(String(chatId), []);
+  }
+
   /**
    * Main Reply Keyboard (Persistent Menu at bottom of chat)
    */
   public static getMainReplyKeyboard() {
     return {
       keyboard: [
-        [{ text: '🛒 ទិញសៀវភៅ' }, { text: '📦 ពិនិត្យស្តុក' }],
-        [{ text: '🚚 តាមដានអីវ៉ាន់' }, { text: '📜 ប្រវត្តិទិញ' }],
-        [{ text: '📞 ជំនួយ & ទំនាក់ទំនង' }, { text: '👥 កម្មវិធីណែនាំ' }]
+        [{ text: '🛒 ទិញសៀវភៅ' }, { text: '🛍️ កន្ត្រកទំនិញ' }],
+        [{ text: '📦 ពិនិត្យស្តុក' }, { text: '🚚 តាមដានអីវ៉ាន់' }],
+        [{ text: '📜 ប្រវត្តិទិញ' }, { text: '📞 ជំនួយ & ទំនាក់ទំនង' }]
       ],
       resize_keyboard: true,
       persistent: true
@@ -1286,7 +1342,10 @@ export class TelegramBotService {
     if (product.fileSize && !isPrinted) {
       text += `├ 💾 <b>ទំហំឯកសារ៖</b> <b>${product.fileSize}</b>\n`;
     }
-    text += `├ 💰 <b>តម្លៃឯកតា៖</b> <code>$${product.price.toFixed(2)} USD</code>\n`;
+    const settings = db.getSettings();
+    const khrRate = settings.khrExchangeRate || 4100;
+
+    text += `├ 💰 <b>តម្លៃឯកតា៖</b> <code>${formatDualPrice(product.price, khrRate)}</code>\n`;
     text += `├ 📦 <b>ស្ថានភាពស្តុក៖</b> <b>${stockStatus}</b>\n`;
     text += `└ 🚚 <b>ការទទួលសៀវភៅ៖</b> ${deliveryInfo}\n\n`;
 
@@ -1296,26 +1355,22 @@ export class TelegramBotService {
       text += `\n🏷️ <b>តារាងបញ្ចុះតម្លៃទិញច្រើន (Bulk Discounts):</b>\n`;
       for (const t of product.tiers) {
         const range = t.maxQty ? `${t.minQty} - ${t.maxQty}` : `ចាប់ពី ${t.minQty} ឡើងទៅ`;
-        text += `• ទិញ ${range} ${unitLabel}៖ <code>$${t.pricePerUnit.toFixed(2)} / ${unitLabel}</code>\n`;
+        text += `• ទិញ ${range} ${unitLabel}៖ <code>${formatDualPrice(t.pricePerUnit, khrRate)} / ${unitLabel}</code>\n`;
       }
     }
 
     text += `\n🛒 <b>ការបញ្ជាទិញបច្ចុប្បន្ន៖</b>\n`;
     text += `┌ 🔢 <b>បរិមាណជ្រើសរើស៖</b> <b>${validQty} ${unitLabel}</b>\n`;
-    text += `└ 💵 <b>ទឹកប្រាក់សរុប៖</b> <code>$${pricing.totalAmount.toFixed(2)} USD</code>`;
+    text += `└ 💵 <b>ទឹកប្រាក់សរុប៖</b> <code>${formatDualPrice(pricing.totalAmount, khrRate)}</code>`;
     if (pricing.isDiscounted) {
-      text += ` <i>(បានបញ្ចុះតម្លៃដុំ $${pricing.unitPrice.toFixed(2)}/${unitLabel})</i>`;
+      text += ` <i>(បានបញ្ចុះតម្លៃដុំ ${formatDualPrice(pricing.unitPrice, khrRate)}/${unitLabel})</i>`;
     }
 
-    // 3-Row Inline Keyboard:
-    // Row 1: [-] [🛒 ចំនួន៖ N] [+]
-    // Row 2: [💳 បន្តទៅទូទាត់ ($XX.XX USD)]
-    // Row 3: [🔙 មើលសៀវភៅផ្សេងទៀត] [🏠 Menu ដើម]
     const nextDec = Math.max(1, validQty - 1);
     const nextInc = availableStock > 0 ? Math.min(availableStock, validQty + 1) : validQty + 1;
-
-    const settings = db.getSettings();
     const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const userCart = this.getCart(chatId);
+    const cartCount = userCart.reduce((sum, item) => sum + item.qty, 0);
 
     const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [
@@ -1326,12 +1381,16 @@ export class TelegramBotService {
       [
         {
           text: availableStock >= validQty
-            ? `💳 បន្តទៅទូទាត់ ($${pricing.totalAmount.toFixed(2)} USD)`
+            ? `💳 ទិញភ្លាមៗ (${formatDualPrice(pricing.totalAmount, khrRate)})`
             : `❌ អស់ស្តុកមិនអាចទិញបាន`,
           callback_data: availableStock >= validQty
             ? `order_checkout_${productId}_${validQty}`
             : `qty_info_outofstock`
         }
+      ],
+      [
+        { text: `➕ ដាក់ចូលកន្ត្រក (${validQty} ${unitLabel})`, callback_data: `cart_add_${productId}_${validQty}` },
+        { text: `🛍️ មើលកន្ត្រក (${cartCount})`, callback_data: `cart_view` }
       ],
       [
         { text: '👀 មើលគំរូ & សាកល្បង QCM', callback_data: `prod_sample_${productId}` },
@@ -1355,6 +1414,341 @@ export class TelegramBotService {
       reply_markup: { inline_keyboard },
       parse_mode: 'HTML'
     });
+  }
+
+  /**
+   * Cart System: View user's cart
+   */
+  public static async sendCartView(chatId: number | string, messageIdToEdit?: number) {
+    const cart = this.getCart(chatId);
+    const settings = db.getSettings();
+    const khrRate = settings.khrExchangeRate || 4100;
+
+    if (cart.length === 0) {
+      const emptyMsg = `🛍️ <b>កន្ត្រកទំនិញរបស់អ្នកទទេស្អាត! (EMPTY CART)</b>\n━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `លោកអ្នកមិនទាន់បានដាក់សៀវភៅចូលក្នុងកន្ត្រកនៅឡើយទេ។\n\n` +
+        `👇 សូមចូលទៅកាន់កាតាឡុកសៀវភៅ រួចចុច <b>[➕ ដាក់ចូលកន្ត្រក]</b> ដើម្បីជ្រើសរើសសៀវភៅជាច្រើនក្បាលក្នុងពេលតែមួយ!`;
+
+      const inline_keyboard = [
+        [{ text: '📚 ទៅកាន់បញ្ជីសៀវភៅ (Catalog)', callback_data: 'catalog_menu' }],
+        [{ text: '🏠 Menu ដើម', callback_data: 'menu_main' }]
+      ];
+
+      if (messageIdToEdit) {
+        const edited = await this.editMessageText(chatId, messageIdToEdit, emptyMsg, {
+          reply_markup: { inline_keyboard },
+          parse_mode: 'HTML'
+        });
+        if (edited) return;
+      }
+
+      await this.sendMessage(chatId, emptyMsg, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+      return;
+    }
+
+    const products = db.getProducts();
+    let subtotal = 0;
+    let totalQty = 0;
+    let hasHardcopy = false;
+
+    let msg = `🛍️ <b>កន្ត្រកទំនិញរបស់អ្នក (YOUR CART)</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    const inline_keyboard: Array<Array<{ text: string; callback_data: string }>> = [];
+
+    cart.forEach((item, idx) => {
+      const prod = products.find(p => p.id === item.productId);
+      if (!prod) return;
+      const isPrinted = prod.bookFormat === 'printed';
+      if (isPrinted) hasHardcopy = true;
+      const lineTotal = prod.price * item.qty;
+      subtotal += lineTotal;
+      totalQty += item.qty;
+      const icon = isPrinted ? '📖' : '📄';
+
+      msg += `<b>${idx + 1}. ${icon} ${prod.name}</b>\n` +
+        `   └ បរិមាណ៖ <b>${item.qty}</b> x $${prod.price.toFixed(2)} = <code>$${lineTotal.toFixed(2)} USD</code>\n`;
+
+      inline_keyboard.push([
+        { text: `➖`, callback_data: `cart_dec_${item.productId}` },
+        { text: `${prod.name.slice(0, 15)} (${item.qty})`, callback_data: `cart_info_${item.productId}` },
+        { text: `➕`, callback_data: `cart_inc_${item.productId}` },
+        { text: `❌`, callback_data: `cart_rem_${item.productId}` }
+      ]);
+    });
+
+    const ppFee = settings.shippingFeePhnomPenh !== undefined ? settings.shippingFeePhnomPenh : 1.25;
+    const provFee = settings.shippingFeeProvince !== undefined ? settings.shippingFeeProvince : 1.75;
+    const freeThreshold = settings.freeShippingThreshold !== undefined ? settings.freeShippingThreshold : 15.0;
+
+    msg += `\n━━━━━━━━━━━━━━━━━━━━\n` +
+      `┌ 🔢 <b>ចំនួនសៀវភៅសរុប៖</b> <b>${totalQty} ក្បាល/ច្បាប់</b>\n` +
+      `├ 💵 <b>សរុបបណ្តោះអាសន្ន (Subtotal)៖</b> <code>${formatDualPrice(subtotal, khrRate)}</code>\n`;
+
+    if (hasHardcopy) {
+      if (subtotal >= freeThreshold) {
+        msg += `└ 🚚 <b>ថ្លៃដឹកជញ្ជូន៖</b> 🎉 <b>ឥតគិតថ្លៃ (Free Delivery &gt;= $${freeThreshold.toFixed(2)})</b>\n`;
+      } else {
+        msg += `└ 🚚 <b>ថ្លៃដឹកជញ្ជូន៖</b> ភ្នំពេញ <code>$${ppFee.toFixed(2)}</code> | ខេត្ត <code>$${provFee.toFixed(2)}</code> (ទិញចាប់ពី $${freeThreshold.toFixed(2)} Free!)\n`;
+      }
+    } else {
+      msg += `└ ⚡ <b>ការដឹកជញ្ជូន៖</b> ទាញយក PDF អានភ្លាមៗ 24/7 (ឥតគិតថ្លៃដឹក)\n`;
+    }
+
+    msg += `\n👇 <i>លោកអ្នកអាចកែសម្រួលចំនួន ឬចុចបន្តទៅទូទាត់កន្ត្រក៖</i>`;
+
+    inline_keyboard.push([
+      { text: `💳 ទូទាត់កន្ត្រក (${formatDualPrice(subtotal, khrRate)})`, callback_data: `cart_checkout` }
+    ]);
+    inline_keyboard.push([
+      { text: `📚 បន្ថែមសៀវភៅទៀត`, callback_data: `catalog_menu` },
+      { text: `🗑️ សម្អាតកន្ត្រក`, callback_data: `cart_clear` }
+    ]);
+    inline_keyboard.push([
+      { text: '🏠 Menu ដើម', callback_data: 'menu_main' }
+    ]);
+
+    if (messageIdToEdit) {
+      const edited = await this.editMessageText(chatId, messageIdToEdit, msg, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+      if (edited) return;
+    }
+
+    await this.sendMessage(chatId, msg, {
+      reply_markup: { inline_keyboard },
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
+   * Cart Checkout - Initiates delivery flow if cart has printed books, or direct checkout
+   */
+  public static async handleCartCheckout(chatId: number | string, username: string, firstName: string) {
+    const cart = this.getCart(chatId);
+    if (cart.length === 0) {
+      await this.sendMessage(chatId, '🛍️ កន្ត្រកទំនិញរបស់អ្នកទទេស្អាត។ សូមជ្រើសរើសសៀវភៅជាមុនសិន!');
+      return;
+    }
+
+    const products = db.getProducts();
+    const hasHardcopy = cart.some(item => {
+      const prod = products.find(p => p.id === item.productId);
+      return prod?.bookFormat === 'printed';
+    });
+
+    if (hasHardcopy) {
+      const totalAmount = cart.reduce((sum, item) => {
+        const prod = products.find(p => p.id === item.productId);
+        return sum + (prod ? prod.price * item.qty : 0);
+      }, 0);
+
+      this.customerStates.set(String(chatId), {
+        step: 'awaiting_shipping_name',
+        data: {
+          isCart: true,
+          username,
+          firstName,
+          totalAmount
+        }
+      });
+
+      const promptText = `📦 <b>ការទូទាត់កន្ត្រកសៀវភៅ (CART ORDER)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+        `កន្ត្រករបស់អ្នកមានសៀវភៅក្រដាស (Hardcopy)។ យើងខ្ញុំផ្ញើជូនតាមរយៈ <b>VET Express / J&T Express</b> ឬដឹកដល់ផ្ទះក្នុងរាជធានីភ្នំពេញ។\n\n` +
+        `📝 <b>ជំហានទី ១/៣៖</b> សូមវាយបញ្ចូល <b>ឈ្មោះពេញរបស់អ្នកទទួល</b> (ឧ. លោក សុខ ចិន្តា)៖`;
+
+      const inline_keyboard: any[] = [];
+      if (firstName && firstName !== 'User' && firstName !== 'Customer') {
+        inline_keyboard.push([{ text: `👉 ប្រើឈ្មោះ "${firstName}"`, callback_data: `ship_name_self` }]);
+      }
+      inline_keyboard.push([{ text: '❌ បោះបង់ការទិញ', callback_data: 'ship_cancel' }]);
+
+      await this.sendMessage(chatId, promptText, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+      return;
+    }
+
+    await this.finalizeCartCheckout(chatId, username, firstName);
+  }
+
+  /**
+   * Finalize Cart Checkout & generate unified KHQR Invoice
+   */
+  public static async finalizeCartCheckout(
+    chatId: number | string,
+    username: string,
+    firstName: string,
+    shippingInfo?: {
+      shippingRecipient?: string;
+      shippingPhone?: string;
+      shippingAddress?: string;
+    }
+  ) {
+    const cart = this.getCart(chatId);
+    if (cart.length === 0) return;
+
+    const products = db.getProducts();
+    const orderItems: Array<{ productId: string; productName: string; quantity: number; unitPrice: number; bookFormat?: string }> = [];
+    let subtotal = 0;
+    let totalQty = 0;
+    let hasHardcopy = false;
+
+    for (const item of cart) {
+      const prod = products.find(p => p.id === item.productId);
+      if (!prod) continue;
+      const isPrinted = prod.bookFormat === 'printed';
+      if (isPrinted) hasHardcopy = true;
+      const available = db.getAvailableStockCount(prod.id);
+      if (available < item.qty) {
+        await this.sendMessage(chatId, `⚠️ សៀវភៅ <b>${prod.name}</b> នៅសល់តែ <b>${available}</b> ប៉ុណ្ណោះ។ សូមកែសម្រួលចំនួនក្នុងកន្ត្រក!`, { parse_mode: 'HTML' });
+        return;
+      }
+      const lineTotal = prod.price * item.qty;
+      subtotal += lineTotal;
+      totalQty += item.qty;
+      orderItems.push({
+        productId: prod.id,
+        productName: prod.name,
+        quantity: item.qty,
+        unitPrice: prod.price,
+        bookFormat: prod.bookFormat || 'pdf'
+      });
+    }
+
+    const settings = db.getSettings();
+    const expiryMinutes = settings.qrExpiryMinutes || 5;
+    const orderId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    for (const item of cart) {
+      db.reserveStock(item.productId, item.qty, orderId, expiryMinutes);
+    }
+
+    let shippingFee = 0;
+    if (hasHardcopy) {
+      const isPP = (shippingInfo?.shippingAddress || '').includes('ភ្នំពេញ') ||
+        (shippingInfo?.shippingAddress || '').toLowerCase().includes('phnom penh') ||
+        (shippingInfo?.shippingAddress || '').includes('ship_addr_pp');
+      const ppFee = settings.shippingFeePhnomPenh !== undefined ? settings.shippingFeePhnomPenh : 1.25;
+      const provFee = settings.shippingFeeProvince !== undefined ? settings.shippingFeeProvince : 1.75;
+      const freeThreshold = settings.freeShippingThreshold !== undefined ? settings.freeShippingThreshold : 15.0;
+      shippingFee = subtotal >= freeThreshold ? 0 : (isPP ? ppFee : provFee);
+    }
+
+    const finalTotalAmount = Number((subtotal + shippingFee).toFixed(2));
+    const khrRate = settings.khrExchangeRate || 4100;
+    const totalAmountKhr = Math.round(finalTotalAmount * khrRate);
+
+    const numericId = typeof chatId === 'number' ? chatId : parseInt(String(chatId), 10) || 10001;
+    const customer = db.upsertCustomer(numericId, username, firstName);
+
+    if (shippingInfo) {
+      if (shippingInfo.shippingPhone && !customer.phone) customer.phone = shippingInfo.shippingPhone;
+      if (shippingInfo.shippingAddress && !customer.defaultShippingAddress) customer.defaultShippingAddress = shippingInfo.shippingAddress;
+      db.saveData();
+    }
+
+    const payment = await CutLuyService.createPayment(orderId, finalTotalAmount);
+    const expiresAt = new Date(Date.now() + expiryMinutes * 60 * 1000).toISOString();
+
+    const firstItem = orderItems[0];
+    const orderTitle = orderItems.length > 1
+      ? `${firstItem.productName} (+${orderItems.length - 1} មុខទៀត)`
+      : firstItem.productName;
+
+    const newOrder: Order = {
+      id: orderId,
+      referenceId: orderId,
+      telegramId: String(chatId),
+      telegramUsername: username || 'User',
+      customerName: firstName || 'Customer',
+      productId: firstItem.productId,
+      productName: orderTitle,
+      quantity: totalQty,
+      unitPrice: firstItem.unitPrice,
+      subtotal,
+      shippingFee: hasHardcopy ? shippingFee : 0,
+      discountAmount: 0,
+      couponCode: null,
+      totalAmount: finalTotalAmount,
+      totalAmountKhr,
+      items: orderItems,
+      status: 'pending',
+      paymentProvider: 'cutluy',
+      cutluyPaymentId: payment.paymentId,
+      checkoutUrl: payment.checkoutUrl || null,
+      qrString: payment.qrString,
+      qrImageDataUrl: payment.qrDataUrl,
+      expiresAt,
+      deliveredItems: [],
+      referralTelegramId: customer.referredBy || null,
+      commissionEarned: customer.referredBy ? (settings.referralCommissionPerAccount * totalQty) : 0,
+      createdAt: new Date().toISOString(),
+      completedAt: null,
+      bookFormat: hasHardcopy ? 'printed' : 'pdf',
+      shippingRecipient: hasHardcopy ? (shippingInfo?.shippingRecipient || customer.firstName) : undefined,
+      shippingPhone: hasHardcopy ? (shippingInfo?.shippingPhone || customer.phone) : undefined,
+      shippingAddress: hasHardcopy ? (shippingInfo?.shippingAddress || customer.defaultShippingAddress) : undefined,
+      shippingStatus: hasHardcopy ? 'pending' : undefined
+    };
+
+    db.addOrder(newOrder);
+    this.clearCart(chatId);
+
+    let caption = `🇰🇭 <b>វិក្កយបត្របង់ប្រាក់ KHQR ស្វ័យប្រវត្ត (OFFICIAL INVOICE)</b>\n━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `┌ 🔖 <b>លេខវិក្កយបត្រ៖</b> <code>#${orderId}</code>\n` +
+      `├ 📚 <b>សៀវភៅក្នុងកន្ត្រក៖</b> <b>${orderItems.length} មុខ (${totalQty} ក្បាល/ច្បាប់)</b>\n`;
+
+    orderItems.forEach((it, idx) => {
+      caption += `│  • ${idx + 1}. ${it.productName} (x${it.quantity})\n`;
+    });
+
+    caption += `├ 💵 <b>ថ្លៃទំនិញ (Subtotal)៖</b> $${subtotal.toFixed(2)} USD\n`;
+    if (hasHardcopy) {
+      caption += `├ 🚚 <b>ថ្លៃដឹកជញ្ជូន៖</b> ${shippingFee > 0 ? `$${shippingFee.toFixed(2)} USD` : '🎉 ឥតគិតថ្លៃ (Free Delivery)'}\n`;
+    }
+    caption += `├ 💰 <b>ទឹកប្រាក់ត្រូវទូទាត់សរុប៖</b> <code>${formatDualPrice(finalTotalAmount, khrRate)}</code>\n`;
+
+    if (hasHardcopy && newOrder.shippingRecipient) {
+      caption += `├ 👤 <b>អ្នកទទួល៖</b> <b>${newOrder.shippingRecipient}</b>\n` +
+        `├ 📞 <b>លេខទូរស័ព្ទ៖</b> <code>${newOrder.shippingPhone}</code>\n` +
+        `├ 📍 <b>អាសយដ្ឋានដឹក៖</b> <b>${newOrder.shippingAddress}</b>\n`;
+    }
+
+    caption += `└ ⏱️ <b>សុពលភាព KHQR៖</b> <b>${expiryMinutes} នាទី</b>\n\n` +
+      `📌 <b>ជម្រើសនៃការទូទាត់ប្រាក់៖</b>\n` +
+      `1. <b>ស្កេន KHQR</b> ខាងលើជាមួយ App ធនាគារ (Bakong, ABA, Wing, ACLEDA...)\n` +
+      `2. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n`;
+
+    const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const bakongDeepLink = payment.checkoutUrl || `https://link.payway.com.kh/checkout?qr=${encodeURIComponent(payment.qrString || orderId)}`;
+    const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
+      [
+        { text: '📲 បើកក្នុង ABA / Bakong App', url: bakongDeepLink },
+        { text: '🔄 ពិនិត្យការទូទាត់ (Check)', callback_data: `check_pay_${orderId}` }
+      ],
+      [
+        { text: '💬 ជំនួយ Admin', url: `https://t.me/${supportUser}` },
+        { text: '❌ បោះបង់ (Cancel)', callback_data: `cancel_order_${orderId}` }
+      ]
+    ];
+
+    if (payment.qrBuffer) {
+      await this.sendPhoto(chatId, payment.qrBuffer, caption, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML',
+        qrDataUrl: payment.qrDataUrl
+      });
+    } else {
+      await this.sendMessage(chatId, caption, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+    }
   }
 
   /**
@@ -1384,7 +1778,6 @@ export class TelegramBotService {
     const numericId = typeof chatId === 'number' ? chatId : parseInt(String(chatId), 10) || 10001;
     const customer = db.getCustomerByTelegramId(numericId);
 
-    // Save initial state for step 1
     this.customerStates.set(String(chatId), {
       step: 'awaiting_shipping_name',
       data: {
@@ -1435,7 +1828,7 @@ export class TelegramBotService {
 
     if (raw.startsWith('/start')) {
       this.customerStates.delete(String(chatId));
-      return false; // let handleStart take over
+      return false;
     }
 
     // Step 1: awaiting_shipping_name
@@ -1463,9 +1856,24 @@ export class TelegramBotService {
       return true;
     }
 
-    // Step 2: awaiting_shipping_phone
+    // Step 2: awaiting_shipping_phone with Cambodian regex validation!
     if (session.step === 'awaiting_shipping_phone') {
-      session.data.shippingPhone = raw;
+      if (!isValidCambodianPhone(raw)) {
+        await this.sendMessage(
+          chatId,
+          `⚠️ <b>លេខទូរស័ព្ទមិនត្រឹមត្រូវតាមទម្រង់កម្ពុជាទេ!</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+          `សូមបញ្ចូលលេខទូរស័ព្ទកម្ពុជាដែលមាន ៩ ឬ ១០ ខ្ទង់ (ឧ. 012 345 678, 098 765 432, 070 123 456, 061 234 567)៖`,
+          {
+            reply_markup: {
+              inline_keyboard: [[{ text: '❌ បោះបង់', callback_data: 'ship_cancel' }]]
+            },
+            parse_mode: 'HTML'
+          }
+        );
+        return true;
+      }
+
+      session.data.shippingPhone = raw.replace(/[\s\-\(\)]/g, '');
       session.step = 'awaiting_shipping_address';
 
       const addrPrompt = `📍 <b>ជំហានទី ៣/៣៖ អាសយដ្ឋាន & ក្រុមហ៊ុនដឹកជញ្ជូន</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
@@ -1496,18 +1904,31 @@ export class TelegramBotService {
       const data = session.data;
       this.customerStates.delete(String(chatId));
 
-      await this.handleCheckout(
-        chatId,
-        data.productId,
-        data.quantity,
-        user.username || data.username,
-        user.first_name || data.firstName,
-        {
-          shippingRecipient: data.shippingRecipient,
-          shippingPhone: data.shippingPhone,
-          shippingAddress
-        }
-      );
+      if (data.isCart) {
+        await this.finalizeCartCheckout(
+          chatId,
+          user.username || data.username,
+          user.first_name || data.firstName,
+          {
+            shippingRecipient: data.shippingRecipient,
+            shippingPhone: data.shippingPhone,
+            shippingAddress
+          }
+        );
+      } else {
+        await this.handleCheckout(
+          chatId,
+          data.productId,
+          data.quantity,
+          user.username || data.username,
+          user.first_name || data.firstName,
+          {
+            shippingRecipient: data.shippingRecipient,
+            shippingPhone: data.shippingPhone,
+            shippingAddress
+          }
+        );
+      }
       return true;
     }
 
@@ -1516,6 +1937,7 @@ export class TelegramBotService {
 
   /**
    * Process customer payment slip photo/file (ABA Pay / Wing / Bakong screenshot)
+   * With Late Slip Auto-Revive and Admin Team Notification!
    */
   public static async handleIncomingPaymentSlip(
     chatId: number | string,
@@ -1527,12 +1949,29 @@ export class TelegramBotService {
     const username = user?.username || '';
     const firstName = user?.first_name || 'Customer';
 
-    // Find latest pending order for this customer
     const orders = db.getOrders();
-    const pendingOrder = orders.find(o =>
+    let pendingOrder = orders.find(o =>
       (o.telegramId === strChatId || (strChatId.startsWith('sim_') && o.telegramId.startsWith('sim_'))) &&
       o.status === 'pending'
     );
+
+    let isLateSlip = false;
+    if (!pendingOrder) {
+      // Find latest expired order for this customer and automatically revive it!
+      const expiredOrders = orders.filter(o =>
+        (o.telegramId === strChatId || (strChatId.startsWith('sim_') && o.telegramId.startsWith('sim_'))) &&
+        o.status === 'expired'
+      ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      if (expiredOrders.length > 0) {
+        pendingOrder = expiredOrders[0];
+        isLateSlip = true;
+        pendingOrder.status = 'pending';
+        pendingOrder.expiresAt = new Date(Date.now() + 20 * 60 * 1000).toISOString();
+        pendingOrder.adminNotes = '⚠️ LATE SLIP AUTO-REVIVED: Customer uploaded slip after expiry';
+        db.saveData();
+      }
+    }
 
     if (!pendingOrder) {
       await this.sendMessage(
@@ -1548,26 +1987,28 @@ export class TelegramBotService {
       return;
     }
 
-    // Save slip on order
     const slipUrl = fileIdOrUrl || 'manual_slip_uploaded';
     db.updateOrder(pendingOrder.id, {
       paymentSlipUrl: slipUrl,
-      adminNotes: caption ? `Slip note: ${caption}` : 'Customer uploaded payment slip'
+      adminNotes: caption ? `Slip note: ${caption}` : (isLateSlip ? '⚠️ LATE SLIP: Uploaded after expiry' : 'Customer uploaded payment slip')
     });
 
     const isPrinted = pendingOrder.bookFormat === 'printed';
 
-    // Confirm to customer
-    const confirmMsg = `📥 <b>ទទួលបានរូបភាពវិក្កយបត្របង់ប្រាក់ (PAYMENT SLIP)!</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
-      `┌ 🔖 <b>លេខវិក្កយបត្រ៖</b> <code>#${pendingOrder.id}</code>\n` +
+    let confirmMsg = isLateSlip
+      ? `⚠️ <b>វិក្កយបត្រផុតកំណត់ត្រូវបាន Revive ឡើងវិញ! (LATE SLIP ACCEPTED)</b>\n━━━━━━━━━━━━━━━━━━━━\n`
+      : `📥 <b>ទទួលបានរូបភាពវិក្កយបត្របង់ប្រាក់ (PAYMENT SLIP)!</b>\n━━━━━━━━━━━━━━━━━━━━\n`;
+
+    confirmMsg += `┌ 🔖 <b>លេខវិក្កយបត្រ៖</b> <code>#${pendingOrder.id}</code>\n` +
       `├ 📚 <b>សៀវភៅ៖</b> <b>${pendingOrder.productName}</b>\n` +
       `├ 🏷️ <b>ប្រភេទ៖</b> ${isPrinted ? '📖 សៀវភៅក្រដាស (Hardcopy)' : '📄 សៀវភៅ PDF (E-Book)'}\n` +
       `├ 🔢 <b>បរិមាណ៖</b> <b>${pendingOrder.quantity} ${isPrinted ? 'ក្បាល' : 'ច្បាប់'}</b>\n` +
       `└ 💵 <b>ទឹកប្រាក់៖</b> <code>$${pendingOrder.totalAmount.toFixed(2)} USD</code>\n\n` +
+      (isLateSlip ? `⚡ <i>ទោះបីវិក្កយបត្របានផុតកំណត់ ប៉ុន្តែប្រព័ន្ធបានទទួលយក និងបញ្ជូនទៅ Admin ដើម្បី Approve ជូនភ្លាមៗ!</i>\n\n` : '') +
       `⏳ ក្រុមការងារកំពុងត្រួតពិនិត្យផ្ទៀងផ្ទាត់។ នៅពេល Admin ចុច Approve (យល់ព្រម)៖\n` +
       (isPrinted
         ? `• ប្រព័ន្ធនឹងបញ្ជូនកញ្ចប់សៀវភៅទៅផ្នែកដឹកជញ្ជូន VET/J&T ភ្លាមៗ!\n`
-        : `• ប្រព័ន្ធនឹង <b>ផ្ញើ File PDF ឬតំណភ្ជាប់ទាញយក</b> ជូនលោកអ្នកភ្លាមៗដោយស្វ័យប្រវត្តិ! ⚡\n`) +
+        : `• ប្រព័ន្ធនឹង <b>ផ្ញើ File PDF & តំណភ្ជាប់</b> ជូនលោកអ្នកភ្លាមៗដោយស្វ័យប្រវត្តិ! ⚡\n`) +
       `\n💬 <i>ប្រសិនបើមានសំណួរ ឬត្រូវការជំនួយបន្ទាន់ សូមចុចប៊ូតុងខាងក្រោម៖</i>`;
 
     const settings = db.getSettings();
@@ -1583,8 +2024,7 @@ export class TelegramBotService {
       parse_mode: 'HTML'
     });
 
-    // Notify Admin Team Group, Channel, and Admin Private Chat with interactive Approve / Reject buttons
-    const adminAlertText = `🔔 <b>វិក្កយបត្របង់ប្រាក់រង់ចាំការបញ្ជាក់ (SLIP PENDING APPROVAL)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+    const adminAlertText = `${isLateSlip ? '🚨 <b>⚠️ LATE SLIP PENDING APPROVAL (វិក្កយបត្រផុតកំណត់ ត្រូវបាន Revive)!</b>' : '🔔 <b>វិក្កយបត្របង់ប្រាក់រង់ចាំការបញ្ជាក់ (SLIP PENDING APPROVAL)</b>'}\n━━━━━━━━━━━━━━━━━━━━\n` +
       `┌ 🔖 <b>លេខវិក្កយបត្រ៖</b> <code>#${pendingOrder.id}</code>\n` +
       `├ 📚 <b>សៀវភៅ៖</b> <b>${pendingOrder.productName}</b>\n` +
       `├ 🏷️ <b>ប្រភេទ៖</b> ${isPrinted ? '📖 សៀវភៅក្រដាស (Hardcopy)' : '📄 សៀវភៅ PDF (E-Book)'}\n` +
@@ -1610,7 +2050,7 @@ export class TelegramBotService {
   }
 
   /**
-   * Checkout & Stock Reservation
+   * Checkout & Stock Reservation with Shipping Calculation & Dual Currency
    */
   public static async handleCheckout(
     chatId: number | string,
@@ -1642,7 +2082,6 @@ export class TelegramBotService {
 
     const isPrinted = product.bookFormat === 'printed';
 
-    // If it's a printed book and user hasn't provided shipping details yet, initiate address prompt flow!
     if (isPrinted && !shippingInfo) {
       await this.startHardcopyCheckout(chatId, productId, quantity, username, firstName);
       return;
@@ -1651,21 +2090,19 @@ export class TelegramBotService {
     const settings = db.getSettings();
     const expiryMinutes = settings.qrExpiryMinutes || 5;
     const orderId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
+    const khrRate = settings.khrExchangeRate || 4100;
 
-    // Atomic stock reservation
     const reservedItems = db.reserveStock(productId, quantity, orderId, expiryMinutes);
     if (!reservedItems) {
       await this.sendMessage(chatId, '⚠️ ការកក់ស្តុកបរាជ័យ ដោយសារមានអតិថិជនផ្សេងកំពុងទិញក្នុងពេលដំណាលគ្នា។ សូមព្យាយាមម្តងទៀត!');
       return;
     }
 
-    // Customer info & referral check
     const numericId = typeof chatId === 'number' ? chatId : parseInt(String(chatId), 10) || 10001;
     const customer = db.upsertCustomer(numericId, username, firstName);
     const pricing = calculateOrderPrice(product, quantity);
     const unitLabel = isPrinted ? 'ក្បាល' : 'ច្បាប់';
 
-    // If shipping info was provided, update customer profile
     if (shippingInfo) {
       if (shippingInfo.shippingPhone && !customer.phone) {
         customer.phone = shippingInfo.shippingPhone;
@@ -1676,9 +2113,22 @@ export class TelegramBotService {
       db.saveData();
     }
 
-    // Call CutLuy payment generation
-    const payment = await CutLuyService.createPayment(orderId, pricing.totalAmount);
+    // Shipping calculation for single hardcopy item
+    let shippingFee = 0;
+    if (isPrinted) {
+      const isPP = (shippingInfo?.shippingAddress || '').includes('ភ្នំពេញ') ||
+        (shippingInfo?.shippingAddress || '').toLowerCase().includes('phnom penh') ||
+        (shippingInfo?.shippingAddress || '').includes('ship_addr_pp');
+      const ppFee = settings.shippingFeePhnomPenh !== undefined ? settings.shippingFeePhnomPenh : 1.25;
+      const provFee = settings.shippingFeeProvince !== undefined ? settings.shippingFeeProvince : 1.75;
+      const freeThreshold = settings.freeShippingThreshold !== undefined ? settings.freeShippingThreshold : 15.0;
+      shippingFee = pricing.totalAmount >= freeThreshold ? 0 : (isPP ? ppFee : provFee);
+    }
 
+    const finalTotalAmount = Number((pricing.totalAmount + shippingFee).toFixed(2));
+    const totalAmountKhr = Math.round(finalTotalAmount * khrRate);
+
+    const payment = await CutLuyService.createPayment(orderId, finalTotalAmount);
     const expiresAt = new Date(Date.now() + expiryMinutes * 60 * 1000).toISOString();
     const newOrder: Order = {
       id: orderId,
@@ -1691,9 +2141,18 @@ export class TelegramBotService {
       quantity,
       unitPrice: pricing.unitPrice,
       subtotal: pricing.totalAmount,
+      shippingFee: isPrinted ? shippingFee : 0,
       discountAmount: 0,
       couponCode: null,
-      totalAmount: pricing.totalAmount,
+      totalAmount: finalTotalAmount,
+      totalAmountKhr,
+      items: [{
+        productId: product.id,
+        productName: product.name,
+        quantity,
+        unitPrice: pricing.unitPrice,
+        bookFormat: product.bookFormat || 'pdf'
+      }],
       status: 'pending',
       paymentProvider: 'cutluy',
       cutluyPaymentId: payment.paymentId,
@@ -1722,14 +2181,33 @@ export class TelegramBotService {
 
     db.addOrder(newOrder);
 
-    // Prepare White-Label Caption
     let caption = `🇰🇭 <b>វិក្កយបត្របង់ប្រាក់ KHQR ស្វ័យប្រវត្ត (OFFICIAL INVOICE)</b>\n━━━━━━━━━━━━━━━━━━━━\n\n` +
       `┌ 🔖 <b>លេខវិក្កយបត្រ៖</b> <code>#${orderId}</code>\n` +
       `├ 📚 <b>សៀវភៅ៖</b> <b>${product.name}</b>\n` +
       `├ 🖋️ <b>អ្នកនិពន្ធ៖</b> ${product.author || 'បណ្ណាគារ'}\n` +
       `├ 🏷️ <b>ទម្រង់៖</b> ${isPrinted ? '📖 សៀវភៅព្រីន Hardcopy' : '📄 សៀវភៅអេឡិចត្រូនិក PDF'}\n` +
       `├ 🔢 <b>បរិមាណ៖</b> <b>${quantity} ${unitLabel}</b>\n` +
-      `├ 💵 <b>ទឹកប្រាក់ត្រូវទូទាត់៖</b> <code>$${pricing.totalAmount.toFixed(2)} USD</code>\n`;
+      `├ 💵 <b>ថ្លៃទំនិញ (Subtotal)៖</b> $${pricing.totalAmount.toFixed(2)} USD\n`;
+
+    if (isPrinted) {
+      caption += `├ 🚚 <b>ថ្លៃដឹកជញ្ជូន៖</b> ${shippingFee > 0 ? `$${shippingFee.toFixed(2)} USD` : '🎉 ឥតគិតថ្លៃ (Free Delivery)'}\n`;
+    }
+
+    caption += `├ 💰 <b>ទឹកប្រាក់ត្រូវទូទាត់សរុប៖</b> <code>${formatDualPrice(finalTotalAmount, khrRate)}</code>\n`;
+
+    if (isPrinted && newOrder.shippingRecipient) {
+      caption += `├ 👤 <b>អ្នកទទួល៖</b> <b>${newOrder.shippingRecipient}</b>\n` +
+        `├ 📞 <b>លេខទូរស័ព្ទ៖</b> <code>${newOrder.shippingPhone}</code>\n` +
+        `├ 📍 <b>អាសយដ្ឋានដឹក៖</b> <b>${newOrder.shippingAddress}</b>\n`;
+    }
+
+    caption += `└ ⏱️ <b>សុពលភាព KHQR៖</b> <b>${expiryMinutes} នាទី</b>\n\n` +
+      `📌 <b>ជម្រើសនៃការទូទាត់ប្រាក់៖</b>\n` +
+      `1. <b>ស្កេន KHQR</b> ខាងលើជាមួយ App ធនាគារ (Bakong, ABA, Wing, ACLEDA...) — ប្រព័ន្ធពិនិត្យស្វ័យប្រវត្តិ 24/7!\n` +
+      `2. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n\n` +
+      (isPrinted
+        ? `🚚 <b>ការដឹកជញ្ជូន៖</b> ក្រុមការងារនឹងវេចខ្ចប់ និងបញ្ជូនតាម <b>${newOrder.shippingAddress}</b> ជូនលោកអ្នក!`
+        : `⚡ <b>ឯកសារ PDF៖</b> ប្រព័ន្ធនឹងផ្ញើតំណភ្ជាប់ទាញយក PDF ជូនភ្លាមៗដោយស្វ័យប្រវត្តិនឹងពេលទូទាត់ជោគជ័យ!`);
 
     if (isPrinted && newOrder.shippingRecipient) {
       caption += `├ 👤 <b>អ្នកទទួល៖</b> <b>${newOrder.shippingRecipient}</b>\n` +
@@ -1985,6 +2463,40 @@ export class TelegramBotService {
       );
     }
 
+    // STEP 5: Send Official Digital E-Receipt Card
+    const khrRate = settings.khrExchangeRate || 4100;
+    const finalKhr = order.totalAmountKhr || Math.round(order.totalAmount * khrRate);
+    const subtotalUsd = order.subtotal || (order.totalAmount - (order.shippingFee || 0));
+
+    let itemsList = '';
+    if (order.items && order.items.length > 0) {
+      order.items.forEach((it, i) => {
+        itemsList += `├ 📚 <b>ទំនិញទី ${i + 1}៖</b> ${it.productName} (x${it.quantity})\n`;
+      });
+    } else {
+      itemsList = `├ 📚 <b>ទំនិញ៖</b> ${order.productName} (x${order.quantity} ${isPrinted ? 'ក្បាល' : 'ច្បាប់'})\n`;
+    }
+
+    const receiptMsg = `🧾 <b>វិក្កយបត្រអេឡិចត្រូនិចផ្លូវការ (OFFICIAL E-RECEIPT)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+      `🏢 <b>QCM STORE CAMBODIA</b>\n` +
+      `🛡️ <b>ស្ថានភាព៖</b> [✅ បានទូទាត់ជោគជ័យ - VERIFIED PAID]\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n` +
+      `┌ 🔖 <b>លេខវិក្កយបត្រ៖</b> <code>#${order.id}</code>\n` +
+      `├ 📅 <b>កាលបរិច្ឆេទ៖</b> ${new Date().toLocaleDateString('km-KH')} ${new Date().toLocaleTimeString('km-KH')}\n` +
+      `├ 👤 <b>អតិថិជន៖</b> ${order.customerName} (@${order.telegramUsername})\n` +
+      itemsList +
+      `├ 💵 <b>ថ្លៃទំនិញ (Subtotal)៖</b> $${subtotalUsd.toFixed(2)} USD\n` +
+      (order.shippingFee !== undefined && order.shippingFee > 0
+        ? `├ 🚚 <b>ថ្លៃដឹកជញ្ជូន (Shipping)៖</b> $${order.shippingFee.toFixed(2)} USD\n`
+        : (isPrinted ? `├ 🚚 <b>ថ្លៃដឹកជញ្ជូន (Shipping)៖</b> 🎉 ឥតគិតថ្លៃ (Free Delivery)\n` : '')) +
+      `├ 💰 <b>ទឹកប្រាក់សរុប (USD)៖</b> <b>$${order.totalAmount.toFixed(2)} USD</b>\n` +
+      `├ 🇰🇭 <b>ទឹកប្រាក់សរុប (KHR)៖</b> <b>${finalKhr.toLocaleString()} ៛</b>\n` +
+      `└ 💳 <b>វិធីសាស្រ្តទូទាត់៖</b> KHQR / Bakong / ABA Pay\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n` +
+      `✨ <i>សូមរក្សាទុកវិក្កយបត្រនេះសម្រាប់ផ្ទៀងផ្ទាត់ ឬសេវាបម្រើអតិថិជន 24/7!</i>`;
+
+    await this.sendMessage(chatId, receiptMsg, { parse_mode: 'HTML' });
+
     // Alert Admin Channel, Team Group, and Admin Private Chat with Logistics Card
     if (isPrinted) {
       await this.notifyAdmins(
@@ -2097,6 +2609,63 @@ export class TelegramBotService {
       const parsed = parseProductAndQty(data, 'order_checkout_');
       if (parsed) {
         await this.handleCheckout(chatId, parsed.productId, parsed.qty, username, firstName);
+      }
+      return;
+    }
+
+    // 4.1 Cart System Callbacks
+    if (data.startsWith('cart_add_')) {
+      const parsed = parseProductAndQty(data, 'cart_add_');
+      const productId = parsed ? parsed.productId : data.replace('cart_add_', '');
+      const qty = parsed ? parsed.qty : 1;
+      const totalInCart = this.addToCart(chatId, productId, qty);
+      const prod = db.getProducts().find(p => p.id === productId);
+      await this.answerCallbackQuery(query.id, `✅ បានដាក់ "${prod ? prod.name.slice(0, 18) : 'សៀវភៅ'}" (x${qty}) ចូលកន្ត្រក! (សរុប ${totalInCart})`, true);
+      return;
+    }
+
+    if (data === 'cart_view') {
+      await this.sendCartView(chatId, messageId);
+      return;
+    }
+
+    if (data.startsWith('cart_inc_')) {
+      const productId = data.replace('cart_inc_', '');
+      this.updateCartQty(chatId, productId, 1);
+      await this.sendCartView(chatId, messageId);
+      return;
+    }
+
+    if (data.startsWith('cart_dec_')) {
+      const productId = data.replace('cart_dec_', '');
+      this.updateCartQty(chatId, productId, -1);
+      await this.sendCartView(chatId, messageId);
+      return;
+    }
+
+    if (data.startsWith('cart_rem_')) {
+      const productId = data.replace('cart_rem_', '');
+      this.removeFromCart(chatId, productId);
+      await this.sendCartView(chatId, messageId);
+      return;
+    }
+
+    if (data === 'cart_clear') {
+      this.clearCart(chatId);
+      await this.sendCartView(chatId, messageId);
+      return;
+    }
+
+    if (data === 'cart_checkout') {
+      await this.handleCartCheckout(chatId, username, firstName);
+      return;
+    }
+
+    if (data.startsWith('cart_info_')) {
+      const productId = data.replace('cart_info_', '');
+      const prod = db.getProducts().find(p => p.id === productId);
+      if (prod) {
+        await this.answerCallbackQuery(query.id, `សៀវភៅ៖ ${prod.name} ($${prod.price.toFixed(2)})`);
       }
       return;
     }
@@ -2339,6 +2908,16 @@ export class TelegramBotService {
       (activeSession && activeSession.step === 'awaiting_tracking_search')
     ) {
       await this.handleTrackingQuery(chatId, rawText);
+      return;
+    }
+
+    // Cart View (🛍️ កន្ត្រកទំនិញ)
+    if (
+      rawText.includes('កន្ត្រក') ||
+      rawText.toLowerCase().includes('cart') ||
+      rawText.toLowerCase().includes('basket')
+    ) {
+      await this.sendCartView(chatId);
       return;
     }
 

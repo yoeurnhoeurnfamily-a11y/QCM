@@ -11,6 +11,7 @@ import { BroadcastView } from './components/BroadcastView';
 import { SettingsView } from './components/SettingsView';
 import { TelegramSimulatorModal } from './components/TelegramSimulatorModal';
 import { QuickActivateBotModal } from './components/QuickActivateBotModal';
+import { AdminLoginModal } from './components/AdminLoginModal';
 import { ToastContainer, type ToastMessage } from './components/Toast';
 import { api } from './services/api';
 import type {
@@ -37,6 +38,19 @@ export default function App() {
   const [isActivateModalOpen, setIsActivateModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Authentication state with localStorage persistence
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('qcm_admin_auth') === 'authenticated' ||
+           sessionStorage.getItem('qcm_admin_auth') === 'authenticated';
+  });
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('qcm_admin_auth');
+    localStorage.removeItem('qcm_admin_user');
+    sessionStorage.removeItem('qcm_admin_auth');
+    setIsAuthenticated(false);
+  }, []);
 
   // Fetch all core application data
   const loadAllData = useCallback(async (quiet = false) => {
@@ -352,6 +366,7 @@ export default function App() {
           onRefresh={() => loadAllData(false)}
           openSimulator={() => setIsSimulatorOpen(true)}
           onNavigateTab={setActiveTab}
+          onLogout={handleLogout}
           isRefreshing={isRefreshing}
         />
 
@@ -464,6 +479,11 @@ export default function App() {
 
       {/* Floating Modern Toast Notifications */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+
+      {/* Admin Security PIN Lock Modal */}
+      {!isAuthenticated && (
+        <AdminLoginModal onLoginSuccess={() => setIsAuthenticated(true)} />
+      )}
     </div>
   );
 }

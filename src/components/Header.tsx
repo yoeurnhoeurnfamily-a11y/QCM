@@ -1,5 +1,5 @@
 import React from 'react';
-import { Smartphone, RefreshCw, DollarSign, Bot, ExternalLink } from 'lucide-react';
+import { Smartphone, RefreshCw, DollarSign, Bot, ExternalLink, LogOut } from 'lucide-react';
 import type { DashboardStats, BotSettings } from '../types/store';
 
 interface HeaderProps {
@@ -9,6 +9,7 @@ interface HeaderProps {
   onRefresh: () => void;
   openSimulator: () => void;
   onNavigateTab: (tab: string) => void;
+  onLogout?: () => void;
   isRefreshing: boolean;
 }
 
@@ -30,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   onRefresh,
   openSimulator,
   onNavigateTab,
+  onLogout,
   isRefreshing
 }) => {
   const current = TAB_TITLES[activeTab] || { title: 'ផ្ទាំងគ្រប់គ្រង', subtitle: '' };
@@ -102,6 +104,18 @@ export const Header: React.FC<HeaderProps> = ({
           <Smartphone className="w-4 h-4" />
           <span className="hidden sm:inline">តេស្ត Simulator</span>
         </button>
+
+        {/* Logout Button */}
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-rose-950/40 hover:text-rose-400 hover:border-rose-600/40 border border-slate-700/60 text-[11px] text-slate-300 transition-colors cursor-pointer"
+            title="ចាកចេញពី Admin (Logout)"
+          >
+            <LogOut className="w-3.5 h-3.5 text-rose-400" />
+            <span className="hidden sm:inline">ចាកចេញ</span>
+          </button>
+        )}
       </div>
     </header>
   );
