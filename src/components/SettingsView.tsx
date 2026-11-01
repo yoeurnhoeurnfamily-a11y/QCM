@@ -718,10 +718,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <h4 className="font-bold text-white">សេវាដឹកជញ្ជូន & អត្រាប្តូរប្រាក់រៀល (Shipping & Dual Currency)</h4>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
               <label className="block text-slate-300 font-medium mb-1 text-xs">
-                ថ្លៃដឹកជញ្ជូន ភ្នំពេញ ($)
+                ភ្នំពេញ ធម្មតា ($)
               </label>
               <input
                 type="number"
@@ -731,7 +731,22 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 onChange={(e) => handleChange('shippingFeePhnomPenh', parseFloat(e.target.value) || 0)}
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-cyan-500"
               />
-              <p className="text-[10px] text-slate-500 mt-1">លំនាំដើម $1.25 ក្នុងរាជធានីភ្នំពេញ</p>
+              <p className="text-[10px] text-slate-500 mt-1">លំនាំដើម $1.25 (1-2 ថ្ងៃ)</p>
+            </div>
+
+            <div>
+              <label className="block text-slate-300 font-medium mb-1 text-xs">
+                ភ្នំពេញ បន្ទាន់ក្នុងថ្ងៃ ($)
+              </label>
+              <input
+                type="number"
+                step="0.05"
+                min="0"
+                value={formData.shippingFeeSameDay ?? 2.00}
+                onChange={(e) => handleChange('shippingFeeSameDay', parseFloat(e.target.value) || 0)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-cyan-500"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">Same-Day Express ($2.00)</p>
             </div>
 
             <div>

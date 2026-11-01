@@ -21,7 +21,9 @@ import {
   Package,
   Pencil,
   Trash2,
-  History
+  History,
+  Printer,
+  Navigation
 } from 'lucide-react';
 import type { Order } from '../types/store';
 
@@ -34,6 +36,8 @@ interface OrdersViewProps {
   onUpdateShipping?: (orderId: string, shippingData: {
     shippingStatus?: string;
     trackingNumber?: string;
+    courierService?: string;
+    shippingNotes?: string;
     shippingRecipient?: string;
     shippingPhone?: string;
     shippingAddress?: string;
@@ -52,12 +56,15 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
   const [statusFilter, setStatusFilter] = useState('all');
   const [formatFilter, setFormatFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [waybillOrder, setWaybillOrder] = useState<Order | null>(null);
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   // Shipping edit states
   const [editTracking, setEditTracking] = useState('');
   const [editStatus, setEditStatus] = useState<string>('preparing');
+  const [editCourier, setEditCourier] = useState('');
+  const [editNotes, setEditNotes] = useState('');
   const [isSavingShipping, setIsSavingShipping] = useState(false);
 
   // Edit Order modal state
@@ -199,6 +206,8 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
     setSelectedOrder(ord);
     setEditTracking(ord.trackingNumber || '');
     setEditStatus(ord.shippingStatus || 'preparing');
+    setEditCourier(ord.courierService || 'VET Express (វីរៈប៊ុនថាំ)');
+    setEditNotes(ord.shippingNotes || '');
   };
 
   const handleSaveShipping = async () => {
@@ -207,12 +216,16 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
     try {
       await onUpdateShipping(selectedOrder.id, {
         trackingNumber: editTracking,
-        shippingStatus: editStatus
+        shippingStatus: editStatus,
+        courierService: editCourier,
+        shippingNotes: editNotes
       });
       setSelectedOrder(prev => prev ? {
         ...prev,
         trackingNumber: editTracking,
-        shippingStatus: editStatus as any
+        shippingStatus: editStatus as any,
+        courierService: editCourier,
+        shippingNotes: editNotes
       } : null);
     } finally {
       setIsSavingShipping(false);
@@ -418,6 +431,16 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                             <Eye className="w-3.5 h-3.5" />
                           </button>
 
+                          {ord.bookFormat === 'printed' && (
+                            <button
+                              onClick={() => setWaybillOrder(ord)}
+                              className="p-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-300 hover:text-white transition-colors cursor-pointer"
+                              title="ព្រីនស្លាកដឹកជញ្ជូន A6 (Waybill Sticker)"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+
                           {onUpdateOrder && (
                             <button
                               onClick={() => handleOpenEditModal(ord)}
@@ -537,52 +560,121 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               {/* Printed Book Shipping Information Section */}
               {selectedOrder.bookFormat === 'printed' && (
                 <div className="p-3 bg-amber-950/20 border border-amber-900/30 rounded-xl space-y-2.5">
-                  <span className="font-semibold text-amber-300 flex items-center gap-1.5">
-                    <Truck className="w-4 h-4" />
-                    <span>ព័ត៌មានដឹកជញ្ជូនសៀវភៅព្រីន (Shipping Details)</span>
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-amber-300 flex items-center gap-1.5">
+                      <Truck className="w-4 h-4" />
+                      <span>ព័ត៌មានដឹកជញ្ជូនសៀវភៅព្រីន (Shipping Details)</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setWaybillOrder(selectedOrder)}
+                      className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      <span>🖨️ បោះពុម្ពស្លាក A6</span>
+                    </button>
+                  </div>
 
-                  <div className="space-y-1 text-[11px] text-slate-300">
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-400">អ្នកទទួល៖</span>
-                      <span className="font-semibold text-white">{selectedOrder.shippingRecipient || selectedOrder.customerName}</span>
+                  <div className="space-y-1.5 text-[11px] text-slate-300 bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400">អ្នកទទួល៖</span>
+                        <span className="font-semibold text-white">{selectedOrder.shippingRecipient || selectedOrder.customerName}</span>
+                      </div>
+                      {selectedOrder.shippingSpeed && (
+                        <span className="text-[10px] px-2 py-0.5 rounded font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          {selectedOrder.shippingSpeed === 'express' ? '⚡ SAME-DAY EXPRESS' : 'STANDARD'}
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Phone className="w-3 h-3 text-amber-400" />
-                      <span className="font-mono text-white">{selectedOrder.shippingPhone || '012 889 900'}</span>
+                      <span className="font-mono text-white font-bold">{selectedOrder.shippingPhone || '012 889 900'}</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
                       <span className="text-slate-200">
-                        {selectedOrder.shippingAddress || 'រាជធានីភ្នំពេញ (សូមទាក់ទងបញ្ជាក់ទីតាំងលម្អិត)'}
+                        {selectedOrder.shippingAddress || 'រាជធានីភ្នំពេញ'}
                       </span>
                     </div>
+                    {selectedOrder.province && (
+                      <div className="flex items-center gap-2 text-slate-400">
+                        <span>ខេត្ត/សាខា៖</span>
+                        <span className="text-white font-semibold">{selectedOrder.province} {selectedOrder.branch ? `(សាខា ${selectedOrder.branch})` : ''}</span>
+                      </div>
+                    )}
+                    {selectedOrder.shippingNotes && (
+                      <div className="text-amber-200/90 italic pt-1 border-t border-slate-800/80">
+                        📝 ចំណាំសម្រាប់អ្នកដឹក៖ {selectedOrder.shippingNotes}
+                      </div>
+                    )}
+                    {selectedOrder.shippingLocation && (
+                      <div className="pt-1 border-t border-slate-800/80">
+                        <a
+                          href={selectedOrder.shippingLocation.googleMapsUrl || `https://www.google.com/maps?q=${selectedOrder.shippingLocation.latitude},${selectedOrder.shippingLocation.longitude}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sky-400 hover:text-sky-300 font-medium underline"
+                        >
+                          <Navigation className="w-3 h-3 text-sky-400" />
+                          <span>បើកមើលទីតាំង GPS លើ Google Maps ({selectedOrder.shippingLocation.latitude.toFixed(4)}, {selectedOrder.shippingLocation.longitude.toFixed(4)})</span>
+                        </a>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Tracking Number and Status Form */}
-                  <div className="pt-2 border-t border-amber-900/40 grid grid-cols-2 gap-2">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block mb-1">ស្ថានភាពដឹកជញ្ជូន</span>
-                      <select
-                        value={editStatus}
-                        onChange={(e) => setEditStatus(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white text-xs focus:outline-hidden"
-                      >
-                        <option value="pending">Pending (កំពុងរង់ចាំ)</option>
-                        <option value="preparing">Preparing (កំពុងរៀបចំ)</option>
-                        <option value="shipped">Shipped (បានផ្ញើ/កំពុងដឹក)</option>
-                        <option value="delivered">Delivered (បានដល់ដៃ)</option>
-                      </select>
+                  {/* Courier & Status Form */}
+                  <div className="pt-2 border-t border-amber-900/40 space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block mb-1">ក្រុមហ៊ុនដឹកជញ្ជូន</span>
+                        <select
+                          value={editCourier}
+                          onChange={(e) => setEditCourier(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white text-xs focus:outline-hidden"
+                        >
+                          <option value="VET Express (វីរៈប៊ុនថាំ)">VET Express (វីរៈប៊ុនថាំ)</option>
+                          <option value="J&T Express">J&T Express</option>
+                          <option value="ភ្នំពេញ ធម្មតា (Standard)">ភ្នំពេញ ធម្មតា (Standard)</option>
+                          <option value="ភ្នំពេញ បន្ទាន់ក្នុងថ្ងៃ (Express)">ភ្នំពេញ បន្ទាន់ក្នុងថ្ងៃ (Express)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block mb-1">ស្ថានភាពដឹកជញ្ជូន</span>
+                        <select
+                          value={editStatus}
+                          onChange={(e) => setEditStatus(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white text-xs focus:outline-hidden"
+                        >
+                          <option value="pending">Pending (កំពុងរង់ចាំ)</option>
+                          <option value="preparing">Preparing (កំពុងរៀបចំ)</option>
+                          <option value="shipped">Shipped (បានផ្ញើ/កំពុងដឹក)</option>
+                          <option value="delivered">Delivered (បានដល់ដៃ)</option>
+                        </select>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block mb-1">Tracking Code (Virak Buntham / J&T)</span>
-                      <input
-                        type="text"
-                        value={editTracking}
-                        onChange={(e) => setEditTracking(e.target.value)}
-                        placeholder="ឧ. VET-88912"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white font-mono text-xs focus:outline-hidden"
-                      />
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block mb-1">Tracking Code (VET / J&T)</span>
+                        <input
+                          type="text"
+                          value={editTracking}
+                          onChange={(e) => setEditTracking(e.target.value)}
+                          placeholder="ឧ. VET-88912"
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white font-mono text-xs focus:outline-hidden"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block mb-1">ចំណាំអ្នកដឹក (Note to Rider)</span>
+                        <input
+                          type="text"
+                          value={editNotes}
+                          onChange={(e) => setEditNotes(e.target.value)}
+                          placeholder="ឧ. ខលមុន 15 នាទី"
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white text-xs focus:outline-hidden"
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -592,7 +684,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                       disabled={isSavingShipping}
                       className="w-full mt-2 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs transition-colors cursor-pointer"
                     >
-                      {isSavingShipping ? 'កំពុងរក្សាទុក...' : '💾 រក្សាទុក & ផ្ញើដំណឹង Tracking ទៅ Telegram'}
+                      {isSavingShipping ? 'កំពុងរក្សាទុក...' : '💾 រក្សាទុក & ផ្ញើដំណឹង Dispatch Tracking ទៅ Telegram'}
                     </button>
                   )}
                 </div>
@@ -992,6 +1084,186 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* A6 Thermal Waybill Printable Sticker Modal */}
+      {waybillOrder && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <style>{`
+            @media print {
+              body * {
+                visibility: hidden !important;
+              }
+              #a6-waybill-sticker, #a6-waybill-sticker * {
+                visibility: visible !important;
+              }
+              #a6-waybill-sticker {
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100mm !important;
+                max-width: 100mm !important;
+                margin: 0 !important;
+                padding: 4mm !important;
+                box-shadow: none !important;
+                border: 2px solid #000 !important;
+                background: #fff !important;
+                color: #000 !important;
+              }
+            }
+          `}</style>
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl space-y-4 my-8">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Printer className="w-5 h-5 text-amber-400" />
+                <h3 className="text-sm font-bold text-white">ស្លាកដឹកជញ្ជូន A6 (A6 Shipping Waybill)</h3>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">105mm x 148mm</span>
+              </div>
+              <button
+                onClick={() => setWaybillOrder(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* A6 Printable Thermal Waybill Sticker */}
+            <div className="flex justify-center bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto">
+              <div
+                id="a6-waybill-sticker"
+                className="bg-white text-black p-4 rounded-sm shadow-xl font-sans border-2 border-black"
+                style={{ width: '105mm', minHeight: '148mm', boxSizing: 'border-box' }}
+              >
+                {/* Header: Store branding & Courier Badge */}
+                <div className="flex items-center justify-between border-b-2 border-black pb-2 mb-2">
+                  <div>
+                    <div className="text-xs font-black tracking-wider uppercase text-black">QCM STORE CAMBODIA</div>
+                    <div className="text-[9px] text-gray-700">Hotline: 012 889 900 / 098 776 543</div>
+                  </div>
+                  <div className="text-right">
+                    <span className="inline-block border-2 border-black bg-black text-white px-2 py-0.5 text-[10px] font-black uppercase">
+                      {waybillOrder.courierService || (waybillOrder.shippingAddress?.includes('VET') ? 'VET EXPRESS' : waybillOrder.shippingAddress?.includes('J&T') ? 'J&T EXPRESS' : 'PHNOM PENH')}
+                    </span>
+                    <div className="text-[8px] font-bold text-gray-800 mt-0.5">
+                      {waybillOrder.shippingSpeed === 'express' ? '⚡ SAME-DAY EXPRESS' : 'STANDARD DELIVERY'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Barcode & Tracking Row */}
+                <div className="border border-black p-2 mb-2 bg-gray-50 flex items-center justify-between">
+                  <div>
+                    <div className="text-[8px] font-bold text-gray-600 uppercase">Order ID</div>
+                    <div className="text-sm font-black font-mono tracking-wider">#{waybillOrder.id}</div>
+                    <div className="text-[8px] font-mono tracking-widest text-gray-500">
+                      ||| ||||| || |||| ||| ||||| || |||
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[8px] font-bold text-gray-600 uppercase">Tracking No.</div>
+                    <div className="text-xs font-black font-mono bg-black text-white px-1.5 py-0.5 rounded">
+                      {waybillOrder.trackingNumber || 'PENDING'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Receiver Box - Highlighted with Big Phone */}
+                <div className="border-2 border-black p-2.5 rounded-sm bg-yellow-50/50 mb-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[9px] font-black uppercase bg-black text-white px-1.5 py-0.5">
+                      អ្នកទទួល (RECIPIENT)
+                    </span>
+                    {waybillOrder.province && (
+                      <span className="text-[10px] font-black text-black">
+                        📍 {waybillOrder.province}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Ultra-clear large phone number for delivery rider */}
+                  <div className="text-lg font-black font-mono tracking-wider text-black my-1">
+                    📞 {waybillOrder.shippingPhone || '012 889 900'}
+                  </div>
+
+                  <div className="text-xs font-bold text-black">
+                    👤 {waybillOrder.shippingRecipient || waybillOrder.customerName}
+                  </div>
+
+                  <div className="text-[10px] font-medium leading-tight text-gray-900 mt-1">
+                    🏠 {waybillOrder.shippingAddress || 'រាជធានីភ្នំពេញ'}
+                  </div>
+
+                  {waybillOrder.branch && (
+                    <div className="text-[10px] font-bold text-blue-900 mt-0.5">
+                      🏢 សាខា៖ {waybillOrder.branch}
+                    </div>
+                  )}
+
+                  {waybillOrder.shippingLocation && (
+                    <div className="text-[8px] font-mono text-gray-600 mt-0.5">
+                      GPS: {waybillOrder.shippingLocation.latitude.toFixed(4)}, {waybillOrder.shippingLocation.longitude.toFixed(4)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Package Items & Payment Badge */}
+                <div className="border border-black p-2 mb-2 text-[9px] space-y-1">
+                  <div className="flex justify-between font-bold border-b border-gray-300 pb-1">
+                    <span className="truncate max-w-[200px]">📚 {waybillOrder.productName}</span>
+                    <span className="shrink-0 font-mono">x{waybillOrder.quantity} ក្បាល</span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-0.5">
+                    <div>
+                      <span className="inline-block bg-black text-white font-black px-1.5 py-0.5 text-[9px]">
+                        ✅ PAID / មិនបាច់ទារប្រាក់ (COD: $0.00)
+                      </span>
+                    </div>
+                    <div className="text-right font-mono font-bold text-[10px]">
+                      ${waybillOrder.totalAmount.toFixed(2)} USD
+                    </div>
+                  </div>
+                </div>
+
+                {/* Note to Rider */}
+                <div className="border border-dashed border-black p-1.5 mb-2 bg-gray-50 text-[9px]">
+                  <span className="font-bold">📝 ចំណាំសម្រាប់អ្នកដឹក៖ </span>
+                  <span className="font-semibold text-gray-900">
+                    {waybillOrder.shippingNotes || 'សូមទូរស័ព្ទមុនពេលដឹកជញ្ជូន 15 នាទី'}
+                  </span>
+                </div>
+
+                {/* Footer Warning */}
+                <div className="text-center border-t border-black pt-1 text-[8px] font-bold text-gray-700">
+                  ⚠️ សៀវភៅសិក្សា ហាមបត់ ឬត្រូវទឹក • ពិនិត្យកញ្ចប់មុនទទួល • Hotline: 012 889 900
+                </div>
+              </div>
+            </div>
+
+            {/* Print & Action Controls */}
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-xs text-slate-400">
+                គាំទ្រម៉ាស៊ីនព្រីនស្លាកកម្តៅ Thermal Sticker (Xprinter, Phomemo, HPRT, Zebra)
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setWaybillOrder(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+                >
+                  បិទ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold flex items-center gap-1.5 shadow-lg transition-all cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>🖨️ បោះពុម្ពស្លាក (Print Label)</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

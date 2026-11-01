@@ -48,6 +48,34 @@ export function formatDualPrice(usd: number, exchangeRate = 4100): string {
   return `$${usd.toFixed(2)} USD (≈ ${khr.toLocaleString()} ៛)`;
 }
 
+// Cambodia Provinces for VET Express & J&T Express Logistics
+export const CAMBODIA_PROVINCES = [
+  { id: 'sr', name: 'សៀមរាប', en: 'Siem Reap' },
+  { id: 'btb', name: 'បាត់ដំបង', en: 'Battambang' },
+  { id: 'kpc', name: 'កំពង់ចាម', en: 'Kampong Cham' },
+  { id: 'shv', name: 'ព្រះសីហនុ', en: 'Preah Sihanouk' },
+  { id: 'kpt', name: 'កំពត', en: 'Kampot' },
+  { id: 'bmc', name: 'បន្ទាយមានជ័យ', en: 'Banteay Meanchey' },
+  { id: 'kdl', name: 'កណ្តាល', en: 'Kandal' },
+  { id: 'tko', name: 'តាកែវ', en: 'Takeo' },
+  { id: 'kps', name: 'កំពង់ស្ពឺ', en: 'Kampong Speu' },
+  { id: 'svr', name: 'ស្វាយរៀង', en: 'Svay Rieng' },
+  { id: 'pvg', name: 'ព្រៃវែង', en: 'Prey Veng' },
+  { id: 'pst', name: 'ពោធិ៍សាត់', en: 'Pursat' },
+  { id: 'kch', name: 'កំពង់ឆ្នាំង', en: 'Kampong Chhnang' },
+  { id: 'kth', name: 'កំពង់ធំ', en: 'Kampong Thom' },
+  { id: 'krc', name: 'ក្រចេះ', en: 'Kratie' },
+  { id: 'tbk', name: 'ត្បូងឃ្មុំ', en: 'Tboung Khmum' },
+  { id: 'pln', name: 'ប៉ៃលិន', en: 'Pailin' },
+  { id: 'kep', name: 'កែប', en: 'Kep' },
+  { id: 'omc', name: 'ឧត្តរមានជ័យ', en: 'Oddar Meanchey' },
+  { id: 'stv', name: 'ស្ទឹងត្រែង', en: 'Stung Treng' },
+  { id: 'rtk', name: 'រតនគិរី', en: 'Ratanakiri' },
+  { id: 'mdk', name: 'មណ្ឌលគិរី', en: 'Mondulkiri' },
+  { id: 'pvh', name: 'ព្រះវិហារ', en: 'Preah Vihear' },
+  { id: 'koh', name: 'កោះកុង', en: 'Koh Kong' }
+];
+
 export class TelegramBotService {
   private static isRunning = false;
   private static pollOffset = 0;
@@ -1557,8 +1585,8 @@ export class TelegramBotService {
       });
 
       const promptText = `📦 <b>ការទូទាត់កន្ត្រកសៀវភៅ (CART ORDER)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
-        `កន្ត្រករបស់អ្នកមានសៀវភៅក្រដាស (Hardcopy)។ យើងខ្ញុំផ្ញើជូនតាមរយៈ <b>VET Express / J&T Express</b> ឬដឹកដល់ផ្ទះក្នុងរាជធានីភ្នំពេញ។\n\n` +
-        `📝 <b>ជំហានទី ១/៣៖</b> សូមវាយបញ្ចូល <b>ឈ្មោះពេញរបស់អ្នកទទួល</b> (ឧ. លោក សុខ ចិន្តា)៖`;
+        `កន្ត្រករបស់អ្នកមានសៀវភៅក្រដាស (Hardcopy)។ យើងខ្ញុំផ្ញើជូនតាមរយៈ <b>VET Express / J&T Express</b> ឬអ្នកដឹកជញ្ជូនដល់ផ្ទះក្នុងរាជធានីភ្នំពេញ។\n\n` +
+        `📝 <b>ជំហានទី ១/៥៖</b> សូមវាយបញ្ចូល <b>ឈ្មោះពេញរបស់អ្នកទទួល</b> (ឧ. លោក សុខ ចិន្តា)៖`;
 
       const inline_keyboard: any[] = [];
       if (firstName && firstName !== 'User' && firstName !== 'Customer') {
@@ -1587,6 +1615,12 @@ export class TelegramBotService {
       shippingRecipient?: string;
       shippingPhone?: string;
       shippingAddress?: string;
+      shippingSpeed?: 'standard' | 'express';
+      shippingNotes?: string;
+      shippingLocation?: { latitude: number; longitude: number; googleMapsUrl?: string };
+      province?: string;
+      branch?: string;
+      courierService?: string;
     }
   ) {
     const cart = this.getCart(chatId);
@@ -1630,13 +1664,19 @@ export class TelegramBotService {
 
     let shippingFee = 0;
     if (hasHardcopy) {
-      const isPP = (shippingInfo?.shippingAddress || '').includes('ភ្នំពេញ') ||
-        (shippingInfo?.shippingAddress || '').toLowerCase().includes('phnom penh') ||
-        (shippingInfo?.shippingAddress || '').includes('ship_addr_pp');
-      const ppFee = settings.shippingFeePhnomPenh !== undefined ? settings.shippingFeePhnomPenh : 1.25;
-      const provFee = settings.shippingFeeProvince !== undefined ? settings.shippingFeeProvince : 1.75;
       const freeThreshold = settings.freeShippingThreshold !== undefined ? settings.freeShippingThreshold : 15.0;
-      shippingFee = subtotal >= freeThreshold ? 0 : (isPP ? ppFee : provFee);
+      if (subtotal >= freeThreshold) {
+        shippingFee = 0;
+      } else if (shippingInfo?.shippingSpeed === 'express') {
+        shippingFee = settings.shippingFeeSameDay !== undefined ? settings.shippingFeeSameDay : 2.00;
+      } else {
+        const isPP = (shippingInfo?.shippingAddress || '').includes('ភ្នំពេញ') ||
+          (shippingInfo?.province || '').includes('ភ្នំពេញ') ||
+          (shippingInfo?.courierService || '').includes('Phnom Penh');
+        const ppFee = settings.shippingFeePhnomPenh !== undefined ? settings.shippingFeePhnomPenh : 1.25;
+        const provFee = settings.shippingFeeProvince !== undefined ? settings.shippingFeeProvince : 1.75;
+        shippingFee = isPP ? ppFee : provFee;
+      }
     }
 
     const finalTotalAmount = Number((subtotal + shippingFee).toFixed(2));
@@ -1693,6 +1733,12 @@ export class TelegramBotService {
       shippingRecipient: hasHardcopy ? (shippingInfo?.shippingRecipient || customer.firstName) : undefined,
       shippingPhone: hasHardcopy ? (shippingInfo?.shippingPhone || customer.phone) : undefined,
       shippingAddress: hasHardcopy ? (shippingInfo?.shippingAddress || customer.defaultShippingAddress) : undefined,
+      shippingSpeed: hasHardcopy ? shippingInfo?.shippingSpeed : undefined,
+      shippingNotes: hasHardcopy ? shippingInfo?.shippingNotes : undefined,
+      shippingLocation: hasHardcopy ? shippingInfo?.shippingLocation : undefined,
+      province: hasHardcopy ? shippingInfo?.province : undefined,
+      branch: hasHardcopy ? shippingInfo?.branch : undefined,
+      courierService: hasHardcopy ? (shippingInfo?.courierService || 'VET/J&T/Phnom Penh') : undefined,
       shippingStatus: hasHardcopy ? 'pending' : undefined
     };
 
@@ -1716,7 +1762,9 @@ export class TelegramBotService {
     if (hasHardcopy && newOrder.shippingRecipient) {
       caption += `├ 👤 <b>អ្នកទទួល៖</b> <b>${newOrder.shippingRecipient}</b>\n` +
         `├ 📞 <b>លេខទូរស័ព្ទ៖</b> <code>${newOrder.shippingPhone}</code>\n` +
-        `├ 📍 <b>អាសយដ្ឋានដឹក៖</b> <b>${newOrder.shippingAddress}</b>\n`;
+        `├ 🚚 <b>សេវាដឹក៖</b> <b>${newOrder.courierService || 'ខាងដឹកជញ្ជូន'}</b>${newOrder.shippingSpeed === 'express' ? ' ⚡ (Same-Day)' : ''}\n` +
+        `├ 📍 <b>អាសយដ្ឋានដឹក៖</b> <b>${newOrder.shippingAddress}</b>\n` +
+        (newOrder.shippingNotes ? `├ 📝 <b>ចំណាំអ្នកដឹក៖</b> <i>${newOrder.shippingNotes}</i>\n` : '');
     }
 
     caption += `└ ⏱️ <b>សុពលភាព KHQR៖</b> <b>${expiryMinutes} នាទី</b>\n\n` +
@@ -1775,8 +1823,6 @@ export class TelegramBotService {
     }
 
     const pricing = calculateOrderPrice(product, quantity);
-    const numericId = typeof chatId === 'number' ? chatId : parseInt(String(chatId), 10) || 10001;
-    const customer = db.getCustomerByTelegramId(numericId);
 
     this.customerStates.set(String(chatId), {
       step: 'awaiting_shipping_name',
@@ -1794,7 +1840,7 @@ export class TelegramBotService {
       `🔢 <b>បរិមាណ៖</b> <b>${quantity} ក្បាល</b>\n` +
       `💵 <b>តម្លៃសរុប៖</b> <code>$${pricing.totalAmount.toFixed(2)} USD</code>\n\n` +
       `🚚 <b>ការដឹកជញ្ជូន៖</b> យើងខ្ញុំផ្ញើជូនតាមរយៈ <b>VET Express (វីរៈប៊ុនថាំ) / J&T Express</b> ឬអ្នកដឹកជញ្ជូនដល់គេហដ្ឋានក្នុងរាជធានីភ្នំពេញ។\n\n` +
-      `📝 <b>ជំហានទី ១/៣៖</b> សូមវាយបញ្ចូល <b>ឈ្មោះពេញរបស់អ្នកទទួល</b> (ឧ. លោក សុខ ចិន្តា)៖`;
+      `📝 <b>ជំហានទី ១/៥៖</b> សូមវាយបញ្ចូល <b>ឈ្មោះពេញរបស់អ្នកទទួល</b> (ឧ. លោក សុខ ចិន្តា)៖`;
 
     const inline_keyboard: any[] = [];
     if (firstName && firstName !== 'User' && firstName !== 'Customer') {
@@ -1806,6 +1852,235 @@ export class TelegramBotService {
       reply_markup: { inline_keyboard },
       parse_mode: 'HTML'
     });
+  }
+
+  /**
+   * Prompt Phnom Penh Delivery: GPS Drop Pin & Khan picker
+   */
+  public static async promptPhnomPenhLocation(chatId: number | string, speed: 'standard' | 'express') {
+    const speedLabel = speed === 'express' ? '⚡ ភ្នំពេញបន្ទាន់ក្នុងថ្ងៃ (Same-Day Express)' : '🚚 ភ្នំពេញធម្មតា (Standard Next-Day)';
+    const msg = `📍 <b>ជំហានទី ៤/៥៖ អាសយដ្ឋាន ឬ Drop Pin GPS (ភ្នំពេញ)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+      `⚡ <b>សេវាដឹក៖</b> <b>${speedLabel}</b>\n\n` +
+      `លោកអ្នកអាចផ្ញើ <b>ទីតាំង GPS (Drop Pin)</b> តាមរយៈប៊ូតុងខាងក្រោម ឬជ្រើសរើសខណ្ឌ ឬវាយបញ្ចូលផ្ទះលេខ ផ្លូវ សង្កាត់ ខណ្ឌ៖`;
+
+    // Reply keyboard with native GPS location button
+    const locationKeyboard = {
+      keyboard: [
+        [{ text: '📍 ផ្ញើទីតាំង GPS របស់ខ្ញុំ (Drop Pin)', request_location: true }],
+        [{ text: '❌ បោះបង់' }]
+      ],
+      resize_keyboard: true,
+      one_time_keyboard: true
+    };
+
+    await this.sendMessage(chatId, msg, {
+      reply_markup: locationKeyboard,
+      parse_mode: 'HTML'
+    });
+
+    // Quick Khan selector
+    const khanKeyboard = {
+      inline_keyboard: [
+        [
+          { text: '📍 ខណ្ឌទួលគោក', callback_data: 'ship_khan_ទួលគោក' },
+          { text: '📍 ខណ្ឌចំការមន', callback_data: 'ship_khan_ចំការមន' }
+        ],
+        [
+          { text: '📍 ខណ្ឌដូនពេញ', callback_data: 'ship_khan_ដូនពេញ' },
+          { text: '📍 ខណ្ឌ៧មករា', callback_data: 'ship_khan_៧មករា' }
+        ],
+        [
+          { text: '📍 ខណ្ឌសែនសុខ', callback_data: 'ship_khan_សែនសុខ' },
+          { text: '📍 ខណ្ឌមានជ័យ', callback_data: 'ship_khan_មានជ័យ' }
+        ],
+        [
+          { text: '📍 ខណ្ឌពោធិ៍សែនជ័យ', callback_data: 'ship_khan_ពោធិ៍សែនជ័យ' },
+          { text: '📍 ខណ្ឌបឹងកេងកង', callback_data: 'ship_khan_បឹងកេងកង' }
+        ],
+        [
+          { text: '❌ បោះបង់', callback_data: 'ship_cancel' }
+        ]
+      ]
+    };
+
+    await this.sendMessage(chatId, `<i>👇 ឬចុចជ្រើសរើសខណ្ឌរហ័សខាងក្រោម៖</i>`, {
+      reply_markup: khanKeyboard,
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
+   * Interactive Province Picker (Cambodia 24 Provinces) for VET and J&T Express
+   */
+  public static async promptProvincePicker(chatId: number | string, courier: string, page = 0) {
+    const pageSize = 8;
+    const totalPages = Math.ceil(CAMBODIA_PROVINCES.length / pageSize);
+    const startIdx = page * pageSize;
+    const currentProvinces = CAMBODIA_PROVINCES.slice(startIdx, startIdx + pageSize);
+
+    const msg = `🏢 <b>ជំហានទី ៤/៥៖ ជ្រើសរើសខេត្តទទួល (${courier})</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+      `សូមចុចជ្រើសរើសខេត្តដែលលោកអ្នកចង់ទទួលកញ្ចប់សៀវភៅ (ទំព័រ ${page + 1}/${totalPages})៖\n\n` +
+      `<i>* ប្រព័ន្ធគាំទ្រគ្រប់ ២៤ ខេត្តទូទាំងប្រទេសកម្ពុជា។</i>`;
+
+    const inline_keyboard: any[][] = [];
+    for (let i = 0; i < currentProvinces.length; i += 2) {
+      const row: any[] = [];
+      row.push({
+        text: `📍 ${currentProvinces[i].name}`,
+        callback_data: `ship_prov_${currentProvinces[i].id}`
+      });
+      if (i + 1 < currentProvinces.length) {
+        row.push({
+          text: `📍 ${currentProvinces[i + 1].name}`,
+          callback_data: `ship_prov_${currentProvinces[i + 1].id}`
+        });
+      }
+      inline_keyboard.push(row);
+    }
+
+    const navRow: any[] = [];
+    if (page > 0) {
+      navRow.push({ text: '⬅️ ទំព័រមុន', callback_data: `ship_prov_page_${page - 1}` });
+    }
+    if (page + 1 < totalPages) {
+      navRow.push({ text: 'ទំព័របន្ទាប់ ➡️', callback_data: `ship_prov_page_${page + 1}` });
+    }
+    if (navRow.length > 0) inline_keyboard.push(navRow);
+
+    inline_keyboard.push([{ text: '❌ បោះបង់ការទិញ', callback_data: 'ship_cancel' }]);
+
+    await this.sendMessage(chatId, msg, {
+      reply_markup: { inline_keyboard },
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
+   * Interactive Branch Picker for selected Province
+   */
+  public static async promptBranchPicker(chatId: number | string, courier: string, provinceName: string) {
+    const msg = `🏢 <b>ជ្រើសរើសសាខា ${courier} (${provinceName})</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+      `📍 <b>ខេត្ត៖</b> <b>${provinceName}</b>\n\n` +
+      `សូមចុចជ្រើសរើសសាខាខាងក្រោម ឬវាយបញ្ចូលឈ្មោះសាខាជាក់លាក់ (ឧ. សាខាផ្សារលើ, សាខាក្រុង, សាខាស្រុកពួក)៖`;
+
+    const inline_keyboard: any[][] = [
+      [
+        { text: `🏢 សាខាក្រុង / ទីរួមខេត្ត`, callback_data: `ship_branch_town` },
+        { text: `🏪 សាខាផ្សារធំ / ផ្សារលើ`, callback_data: `ship_branch_market` }
+      ],
+      [
+        { text: `🚌 សាខាបេនឡាន`, callback_data: `ship_branch_bus` },
+        { text: `🔄 ប្តូរខេត្តឡើងវិញ`, callback_data: `ship_prov_back` }
+      ],
+      [
+        { text: '❌ បោះបង់', callback_data: 'ship_cancel' }
+      ]
+    ];
+
+    await this.sendMessage(chatId, msg, {
+      reply_markup: { inline_keyboard },
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
+   * Prompt Note to Rider / Delivery Instructions (Step 5 of 5)
+   */
+  public static async promptRiderNotes(chatId: number | string, data: any) {
+    const courier = data.courierService || 'ខាងដឹកជញ្ជូន';
+    const msg = `📝 <b>ជំហានទី ៥/៥៖ ចំណាំបន្ថែមសម្រាប់អ្នកដឹក (NOTE TO RIDER)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+      `👤 <b>អ្នកទទួល៖</b> <b>${data.shippingRecipient}</b>\n` +
+      `📞 <b>លេខទូរស័ព្ទ៖</b> <code>${data.shippingPhone}</code>\n` +
+      `🚚 <b>សេវាដឹក៖</b> <b>${courier}</b>\n` +
+      `📍 <b>ទីតាំង/សាខា៖</b> ${data.shippingAddress}\n\n` +
+      `តើលោកអ្នកមានចំណាំអ្វីបន្ថែមជូនអ្នកដឹកជញ្ជូនទេ? (ឧ. 'ដឹកពេលរសៀល', 'ខលមុនមកដល់ 15 នាទី', 'ដាក់មុខទ្វាររបង', 'លេខទូរស័ព្ទបម្រុង 012...')\n\n` +
+      `👇 <i>សូមជ្រើសរើសជម្រើសរហ័សខាងក្រោម ឬចុច [⏭️ គ្មានចំណាំ (Skip)] ប្រសិនបើគ្មានចំណាំ៖</i>`;
+
+    const inline_keyboard = [
+      [
+        { text: '📞 ខលមុន 15 នាទី', callback_data: 'ship_note_call15' },
+        { text: '☀️ ដឹកពេលរសៀល', callback_data: 'ship_note_afternoon' }
+      ],
+      [
+        { text: '🏠 ទុកមុខផ្ទះ/របង', callback_data: 'ship_note_gate' },
+        { text: '⏭️ គ្មានចំណាំ (Skip)', callback_data: 'ship_note_skip' }
+      ],
+      [
+        { text: '❌ បោះបង់', callback_data: 'ship_cancel' }
+      ]
+    ];
+
+    await this.sendMessage(chatId, msg, {
+      reply_markup: { inline_keyboard },
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
+   * Complete Shipping Checkout after all 5 steps are fulfilled
+   */
+  public static async completeShippingCheckout(chatId: number | string, user: any, sessionData: any, note?: string) {
+    this.customerStates.delete(String(chatId));
+    if (note) {
+      sessionData.shippingNotes = note;
+    }
+
+    const shippingInfo = {
+      shippingRecipient: sessionData.shippingRecipient,
+      shippingPhone: sessionData.shippingPhone,
+      shippingAddress: sessionData.shippingAddress,
+      shippingSpeed: sessionData.shippingSpeed,
+      shippingNotes: sessionData.shippingNotes,
+      shippingLocation: sessionData.shippingLocation,
+      province: sessionData.province,
+      branch: sessionData.branch,
+      courierService: sessionData.courierService
+    };
+
+    if (sessionData.isCart) {
+      await this.finalizeCartCheckout(
+        chatId,
+        user.username || sessionData.username,
+        user.first_name || sessionData.firstName,
+        shippingInfo
+      );
+    } else {
+      await this.handleCheckout(
+        chatId,
+        sessionData.productId,
+        sessionData.quantity,
+        user.username || sessionData.username,
+        user.first_name || sessionData.firstName,
+        shippingInfo
+      );
+    }
+  }
+
+  /**
+   * Handle native Telegram Location message (Drop Pin GPS)
+   */
+  public static async handleLocationMessage(
+    chatId: number | string,
+    location: { latitude: number; longitude: number },
+    user: any
+  ) {
+    const session = this.customerStates.get(String(chatId));
+    if (!session || (session.step !== 'awaiting_shipping_address_pp' && session.step !== 'awaiting_shipping_address')) {
+      await this.sendMessage(chatId, '📍 ទទួលបានទីតាំង GPS! ប្រសិនបើលោកអ្នកចង់ទិញសៀវភៅ សូមចុចលើ [🛒 ទិញសៀវភៅ] ជាមុនសិន។', {
+        reply_markup: this.getMainReplyKeyboard()
+      });
+      return;
+    }
+
+    const { latitude, longitude } = location;
+    const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    session.data.shippingLocation = { latitude, longitude, googleMapsUrl };
+    session.data.shippingAddress = `ភ្នំពេញ (GPS Pin: ${latitude.toFixed(5)}, ${longitude.toFixed(5)})`;
+    session.data.province = 'រាជធានីភ្នំពេញ';
+
+    // Proceed to Step 5: Rider Notes
+    session.step = 'awaiting_shipping_notes';
+    await this.promptRiderNotes(chatId, session.data);
   }
 
   /**
@@ -1839,7 +2114,7 @@ export class TelegramBotService {
       const numericId = typeof chatId === 'number' ? chatId : parseInt(String(chatId), 10) || 10001;
       const customer = db.getCustomerByTelegramId(numericId);
 
-      const phonePrompt = `📞 <b>ជំហានទី ២/៣៖ លេខទូរស័ព្ទទំនាក់ទំនង</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+      const phonePrompt = `📞 <b>ជំហានទី ២/៥៖ លេខទូរស័ព្ទទំនាក់ទំនង</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
         `👤 <b>អ្នកទទួល៖</b> <b>${session.data.shippingRecipient}</b>\n\n` +
         `សូមផ្ញើ <b>លេខទូរស័ព្ទ</b> របស់អ្នកទទួល ដើម្បីឱ្យខាងដឹកជញ្ជូនទាក់ទងពេលទៅដល់ (ឧ. 012 345 678)៖`;
 
@@ -1874,61 +2149,69 @@ export class TelegramBotService {
       }
 
       session.data.shippingPhone = raw.replace(/[\s\-\(\)]/g, '');
-      session.step = 'awaiting_shipping_address';
+      session.step = 'awaiting_shipping_method';
 
-      const addrPrompt = `📍 <b>ជំហានទី ៣/៣៖ អាសយដ្ឋាន & ក្រុមហ៊ុនដឹកជញ្ជូន</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+      const settings = db.getSettings();
+      const ppFee = settings.shippingFeePhnomPenh ?? 1.25;
+      const sameDayFee = settings.shippingFeeSameDay ?? 2.00;
+      const provFee = settings.shippingFeeProvince ?? 1.75;
+      const freeThreshold = settings.freeShippingThreshold ?? 15.0;
+      const isFree = (session.data.totalAmount || 0) >= freeThreshold;
+
+      const methodPrompt = `🚚 <b>ជំហានទី ៣/៥៖ ជ្រើសរើសសេវា & ល្បឿនដឹកជញ្ជូន</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
         `👤 <b>អ្នកទទួល៖</b> <b>${session.data.shippingRecipient}</b>\n` +
         `📞 <b>ទូរស័ព្ទ៖</b> <code>${session.data.shippingPhone}</code>\n\n` +
-        `សូមបញ្ជាក់ទីតាំង និងសេវាដឹកជញ្ជូនដែលចង់បាន៖\n` +
-        `• <b>ភ្នំពេញ៖</b> ដឹកដល់ផ្ទះ (ផ្ទះលេខ ផ្លូវ សង្កាត់ ខណ្ឌ)\n` +
-        `• <b>តាមខេត្ត៖</b> ផ្ញើតាម <b>VET Express (វីរៈប៊ុនថាំ)</b> ឬ <b>J&T Express</b> (សូមបញ្ជាក់ឈ្មោះសាខា ឬស្រុក/ខេត្ត)\n\n` +
-        `<i>👇 លោកអ្នកអាចជ្រើសរើសជម្រើសរហ័សខាងក្រោម ឬវាយបញ្ចូលអាសយដ្ឋានផ្ទាល់៖</i>`;
+        (isFree ? `🎉 <b>ការទិញចាប់ពី $${freeThreshold.toFixed(2)} ឡើងទៅ ដឹកជញ្ជូនឥតគិតថ្លៃ (Free Delivery)!</b>\n\n` : '') +
+        `សូមជ្រើសរើសក្រុមហ៊ុនដឹកជញ្ជូន និងល្បឿនដឹកដែលចង់បាន៖`;
 
       const inline_keyboard = [
-        [{ text: '🚚 ភ្នំពេញ (ដឹកជញ្ជូនដល់ផ្ទះ)', callback_data: 'ship_addr_pp' }],
-        [{ text: '📦 VET Express វីរៈប៊ុនថាំ (តាមខេត្ត)', callback_data: 'ship_addr_vet' }],
-        [{ text: '🚀 J&T Express (តាមខេត្ត)', callback_data: 'ship_addr_jnt' }],
-        [{ text: '❌ បោះបង់', callback_data: 'ship_cancel' }]
+        [
+          { text: `🚚 ភ្នំពេញ ធម្មតា (${isFree ? 'Free' : `$${ppFee.toFixed(2)}`})`, callback_data: 'ship_method_pp_std' }
+        ],
+        [
+          { text: `⚡ ភ្នំពេញ បន្ទាន់ក្នុងថ្ងៃ (${isFree ? 'Free' : `$${sameDayFee.toFixed(2)}`})`, callback_data: 'ship_method_pp_exp' }
+        ],
+        [
+          { text: `📦 VET Express វីរៈប៊ុនថាំ (${isFree ? 'Free' : `$${provFee.toFixed(2)}`})`, callback_data: 'ship_method_vet' }
+        ],
+        [
+          { text: `🚀 J&T Express តាមខេត្ត (${isFree ? 'Free' : `$${provFee.toFixed(2)}`})`, callback_data: 'ship_method_jnt' }
+        ],
+        [
+          { text: '❌ បោះបង់', callback_data: 'ship_cancel' }
+        ]
       ];
 
-      await this.sendMessage(chatId, addrPrompt, {
+      await this.sendMessage(chatId, methodPrompt, {
         reply_markup: { inline_keyboard },
         parse_mode: 'HTML'
       });
       return true;
     }
 
-    // Step 3: awaiting_shipping_address (custom typed address)
-    if (session.step === 'awaiting_shipping_address') {
-      const shippingAddress = raw;
-      const data = session.data;
-      this.customerStates.delete(String(chatId));
+    // Step 4a: awaiting_shipping_address_pp (Customer typed Phnom Penh address)
+    if (session.step === 'awaiting_shipping_address_pp' || session.step === 'awaiting_shipping_address') {
+      session.data.shippingAddress = raw;
+      session.data.province = 'រាជធានីភ្នំពេញ';
+      session.step = 'awaiting_shipping_notes';
 
-      if (data.isCart) {
-        await this.finalizeCartCheckout(
-          chatId,
-          user.username || data.username,
-          user.first_name || data.firstName,
-          {
-            shippingRecipient: data.shippingRecipient,
-            shippingPhone: data.shippingPhone,
-            shippingAddress
-          }
-        );
-      } else {
-        await this.handleCheckout(
-          chatId,
-          data.productId,
-          data.quantity,
-          user.username || data.username,
-          user.first_name || data.firstName,
-          {
-            shippingRecipient: data.shippingRecipient,
-            shippingPhone: data.shippingPhone,
-            shippingAddress
-          }
-        );
-      }
+      await this.promptRiderNotes(chatId, session.data);
+      return true;
+    }
+
+    // Step 4b: awaiting_shipping_branch (Customer typed branch/district for VET/J&T)
+    if (session.step === 'awaiting_shipping_branch') {
+      session.data.branch = raw;
+      session.data.shippingAddress = `${session.data.courierService || 'VET/J&T'} - សាខា ${raw}, ខេត្ត ${session.data.province}`;
+      session.step = 'awaiting_shipping_notes';
+
+      await this.promptRiderNotes(chatId, session.data);
+      return true;
+    }
+
+    // Step 5: awaiting_shipping_notes (Customer typed rider note)
+    if (session.step === 'awaiting_shipping_notes') {
+      await this.completeShippingCheckout(chatId, user, session.data, raw);
       return true;
     }
 
@@ -2116,13 +2399,19 @@ export class TelegramBotService {
     // Shipping calculation for single hardcopy item
     let shippingFee = 0;
     if (isPrinted) {
-      const isPP = (shippingInfo?.shippingAddress || '').includes('ភ្នំពេញ') ||
-        (shippingInfo?.shippingAddress || '').toLowerCase().includes('phnom penh') ||
-        (shippingInfo?.shippingAddress || '').includes('ship_addr_pp');
-      const ppFee = settings.shippingFeePhnomPenh !== undefined ? settings.shippingFeePhnomPenh : 1.25;
-      const provFee = settings.shippingFeeProvince !== undefined ? settings.shippingFeeProvince : 1.75;
       const freeThreshold = settings.freeShippingThreshold !== undefined ? settings.freeShippingThreshold : 15.0;
-      shippingFee = pricing.totalAmount >= freeThreshold ? 0 : (isPP ? ppFee : provFee);
+      if (pricing.totalAmount >= freeThreshold) {
+        shippingFee = 0;
+      } else if (shippingInfo?.shippingSpeed === 'express') {
+        shippingFee = settings.shippingFeeSameDay !== undefined ? settings.shippingFeeSameDay : 2.00;
+      } else {
+        const isPP = (shippingInfo?.shippingAddress || '').includes('ភ្នំពេញ') ||
+          (shippingInfo?.province || '').includes('ភ្នំពេញ') ||
+          (shippingInfo?.courierService || '').includes('Phnom Penh');
+        const ppFee = settings.shippingFeePhnomPenh !== undefined ? settings.shippingFeePhnomPenh : 1.25;
+        const provFee = settings.shippingFeeProvince !== undefined ? settings.shippingFeeProvince : 1.75;
+        shippingFee = isPP ? ppFee : provFee;
+      }
     }
 
     const finalTotalAmount = Number((pricing.totalAmount + shippingFee).toFixed(2));
@@ -2176,6 +2465,12 @@ export class TelegramBotService {
       shippingAddress: isPrinted
         ? (shippingInfo?.shippingAddress || customer.defaultShippingAddress || 'រាជធានីភ្នំពេញ (ដឹកជញ្ជូនដល់ផ្ទះ)')
         : undefined,
+      shippingSpeed: isPrinted ? shippingInfo?.shippingSpeed : undefined,
+      shippingNotes: isPrinted ? shippingInfo?.shippingNotes : undefined,
+      shippingLocation: isPrinted ? shippingInfo?.shippingLocation : undefined,
+      province: isPrinted ? shippingInfo?.province : undefined,
+      branch: isPrinted ? shippingInfo?.branch : undefined,
+      courierService: isPrinted ? (shippingInfo?.courierService || 'VET/J&T/Phnom Penh') : undefined,
       shippingStatus: isPrinted ? 'pending' : undefined
     };
 
@@ -2198,21 +2493,9 @@ export class TelegramBotService {
     if (isPrinted && newOrder.shippingRecipient) {
       caption += `├ 👤 <b>អ្នកទទួល៖</b> <b>${newOrder.shippingRecipient}</b>\n` +
         `├ 📞 <b>លេខទូរស័ព្ទ៖</b> <code>${newOrder.shippingPhone}</code>\n` +
-        `├ 📍 <b>អាសយដ្ឋានដឹក៖</b> <b>${newOrder.shippingAddress}</b>\n`;
-    }
-
-    caption += `└ ⏱️ <b>សុពលភាព KHQR៖</b> <b>${expiryMinutes} នាទី</b>\n\n` +
-      `📌 <b>ជម្រើសនៃការទូទាត់ប្រាក់៖</b>\n` +
-      `1. <b>ស្កេន KHQR</b> ខាងលើជាមួយ App ធនាគារ (Bakong, ABA, Wing, ACLEDA...) — ប្រព័ន្ធពិនិត្យស្វ័យប្រវត្តិ 24/7!\n` +
-      `2. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n\n` +
-      (isPrinted
-        ? `🚚 <b>ការដឹកជញ្ជូន៖</b> ក្រុមការងារនឹងវេចខ្ចប់ និងបញ្ជូនតាម <b>${newOrder.shippingAddress}</b> ជូនលោកអ្នក!`
-        : `⚡ <b>ឯកសារ PDF៖</b> ប្រព័ន្ធនឹងផ្ញើតំណភ្ជាប់ទាញយក PDF ជូនភ្លាមៗដោយស្វ័យប្រវត្តិនឹងពេលទូទាត់ជោគជ័យ!`);
-
-    if (isPrinted && newOrder.shippingRecipient) {
-      caption += `├ 👤 <b>អ្នកទទួល៖</b> <b>${newOrder.shippingRecipient}</b>\n` +
-        `├ 📞 <b>លេខទូរស័ព្ទ៖</b> <code>${newOrder.shippingPhone}</code>\n` +
-        `├ 📍 <b>អាសយដ្ឋានដឹក៖</b> <b>${newOrder.shippingAddress}</b>\n`;
+        `├ 🚚 <b>សេវាដឹក៖</b> <b>${newOrder.courierService || 'ខាងដឹកជញ្ជូន'}</b>${newOrder.shippingSpeed === 'express' ? ' ⚡ (Same-Day)' : ''}\n` +
+        `├ 📍 <b>អាសយដ្ឋានដឹក៖</b> <b>${newOrder.shippingAddress}</b>\n` +
+        (newOrder.shippingNotes ? `├ 📝 <b>ចំណាំអ្នកដឹក៖</b> <i>${newOrder.shippingNotes}</i>\n` : '');
     }
 
     caption += `└ ⏱️ <b>សុពលភាព KHQR៖</b> <b>${expiryMinutes} នាទី</b>\n\n` +
@@ -2526,6 +2809,39 @@ export class TelegramBotService {
   }
 
   /**
+   * Automatic dispatch notification sent to customer on Telegram when Admin marks shipped
+   */
+  public static async notifyOrderShipped(order: Order) {
+    if (!order.telegramId) return;
+    const settings = db.getSettings();
+    const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const isExpress = order.shippingSpeed === 'express';
+
+    let msg = `🚚 <b>ដំណឹងកញ្ចប់សៀវភៅត្រូវបានចេញដំណើរ (ORDER DISPATCHED)!</b>\n━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `┌ 🔖 <b>លេខវិក្កយបត្រ៖</b> <code>#${order.id}</code>\n` +
+      `├ 📚 <b>សៀវភៅ៖</b> <b>${order.productName}</b> (x${order.quantity} ${order.bookFormat === 'printed' ? 'ក្បាល' : 'ច្បាប់'})\n` +
+      `├ 🚚 <b>ក្រុមហ៊ុនដឹកជញ្ជូន៖</b> <b>${order.courierService || 'VET Express / J&T Express'}</b>\n` +
+      (isExpress ? `├ ⚡ <b>ល្បឿនដឹក៖</b> <b>Same-Day Express (បន្ទាន់ក្នុងថ្ងៃ)</b>\n` : '') +
+      `├ 🏷️ <b>លេខកូដតាមដាន (Tracking Code)៖</b> <code>${order.trackingNumber || 'មិនទាន់មានលេខកូដ'}</code>\n` +
+      `├ 👤 <b>អ្នកទទួល៖</b> ${order.shippingRecipient || order.customerName}\n` +
+      `├ 📞 <b>លេខទូរស័ព្ទ៖</b> <code>${order.shippingPhone || 'មិនទាន់បញ្ជាក់'}</code>\n` +
+      `├ 📍 <b>អាសយដ្ឋាន/សាខា៖</b> ${order.shippingAddress || 'រាជធានីភ្នំពេញ'}\n` +
+      (order.shippingNotes ? `├ 📝 <b>ចំណាំអ្នកដឹក៖</b> <i>${order.shippingNotes}</i>\n` : '') +
+      `└ 📦 <b>ស្ថានភាពបច្ចុប្បន្ន៖</b> <b>កំពុងដឹកជញ្ជូន (In Transit)</b>\n\n` +
+      `⚡ <i>កញ្ចប់សៀវភៅត្រូវបានវេចខ្ចប់ និងប្រគល់ជូនខាងក្រុមហ៊ុនដឹកជញ្ជូនរួចរាល់ហើយ។ សូមត្រៀមទូរស័ព្ទដើម្បីទទួលការខលពីអ្នកដឹកជញ្ជូន!</i>`;
+
+    const inline_keyboard: any[] = [
+      [{ text: '🔍 ពិនិត្យស្ថានភាពកញ្ចប់អីវ៉ាន់', callback_data: `track_order_${order.id}` }],
+      [{ text: '💬 ទំនាក់ទំនង Admin Support', url: `https://t.me/${supportUser}` }]
+    ];
+
+    await this.sendMessage(order.telegramId, msg, {
+      reply_markup: { inline_keyboard },
+      parse_mode: 'HTML'
+    });
+  }
+
+  /**
    * Check Payment Status Handler (Manual check triggered by user button)
    */
   public static async handleCheckPayment(chatId: number | string, orderId: string, callbackQueryId?: string) {
@@ -2754,26 +3070,143 @@ export class TelegramBotService {
       return;
     }
 
-    if (data === 'ship_addr_pp') {
+    // Step 3 Method Callbacks: Standard PP, Express PP, VET Express, J&T Express
+    if (data === 'ship_method_pp_std') {
       const session = this.customerStates.get(String(chatId));
-      if (session && session.step === 'awaiting_shipping_address') {
-        await this.handleConversationStep(chatId, 'ដឹកជញ្ជូនរហ័ស ក្នុងរាជធានីភ្នំពេញ (Phnom Penh Express)', { id: typeof chatId === 'number' ? chatId : 0, username, first_name: firstName }, session);
+      if (session) {
+        session.data.shippingSpeed = 'standard';
+        session.data.courierService = 'ភ្នំពេញ ធម្មតា (Standard Delivery)';
+        session.step = 'awaiting_shipping_address_pp';
+        await this.promptPhnomPenhLocation(chatId, 'standard');
       }
       return;
     }
 
-    if (data === 'ship_addr_vet') {
+    if (data === 'ship_method_pp_exp') {
       const session = this.customerStates.get(String(chatId));
-      if (session && session.step === 'awaiting_shipping_address') {
-        await this.handleConversationStep(chatId, 'ផ្ញើតាមក្រុមហ៊ុន វីរៈប៊ុនថាំ (VET Express)', { id: typeof chatId === 'number' ? chatId : 0, username, first_name: firstName }, session);
+      if (session) {
+        session.data.shippingSpeed = 'express';
+        session.data.courierService = 'ភ្នំពេញ បន្ទាន់ក្នុងថ្ងៃ (Same-Day Express)';
+        session.step = 'awaiting_shipping_address_pp';
+        await this.promptPhnomPenhLocation(chatId, 'express');
       }
       return;
     }
 
-    if (data === 'ship_addr_jnt') {
+    if (data === 'ship_method_vet') {
       const session = this.customerStates.get(String(chatId));
-      if (session && session.step === 'awaiting_shipping_address') {
-        await this.handleConversationStep(chatId, 'ផ្ញើតាមក្រុមហ៊ុន J&T Express', { id: typeof chatId === 'number' ? chatId : 0, username, first_name: firstName }, session);
+      if (session) {
+        session.data.courierService = 'VET Express (វីរៈប៊ុនថាំ)';
+        session.data.shippingSpeed = 'standard';
+        session.step = 'awaiting_shipping_province';
+        await this.promptProvincePicker(chatId, 'VET Express (វីរៈប៊ុនថាំ)', 0);
+      }
+      return;
+    }
+
+    if (data === 'ship_method_jnt') {
+      const session = this.customerStates.get(String(chatId));
+      if (session) {
+        session.data.courierService = 'J&T Express';
+        session.data.shippingSpeed = 'standard';
+        session.step = 'awaiting_shipping_province';
+        await this.promptProvincePicker(chatId, 'J&T Express', 0);
+      }
+      return;
+    }
+
+    // Province pagination & selection
+    if (data.startsWith('ship_prov_page_')) {
+      const page = parseInt(data.replace('ship_prov_page_', ''), 10) || 0;
+      const session = this.customerStates.get(String(chatId));
+      const courier = session?.data?.courierService || 'ខាងដឹកជញ្ជូន';
+      await this.promptProvincePicker(chatId, courier, page);
+      return;
+    }
+
+    if (data === 'ship_prov_back') {
+      const session = this.customerStates.get(String(chatId));
+      if (session) {
+        session.step = 'awaiting_shipping_province';
+        const courier = session.data.courierService || 'ខាងដឹកជញ្ជូន';
+        await this.promptProvincePicker(chatId, courier, 0);
+      }
+      return;
+    }
+
+    if (data.startsWith('ship_prov_')) {
+      const provId = data.replace('ship_prov_', '');
+      const province = CAMBODIA_PROVINCES.find(p => p.id === provId);
+      const session = this.customerStates.get(String(chatId));
+      if (session && province) {
+        const provName = `${province.name} (${province.en})`;
+        session.data.province = provName;
+        session.step = 'awaiting_shipping_branch';
+        const courier = session.data.courierService || 'ខាងដឹកជញ្ជូន';
+        await this.promptBranchPicker(chatId, courier, provName);
+      }
+      return;
+    }
+
+    // Branch selection
+    if (data === 'ship_branch_town' || data === 'ship_branch_market' || data === 'ship_branch_bus') {
+      const session = this.customerStates.get(String(chatId));
+      if (session) {
+        const branchLabel = data === 'ship_branch_town'
+          ? 'សាខាក្រុង / ទីរួមខេត្ត'
+          : data === 'ship_branch_market'
+            ? 'សាខាផ្សារធំ / ផ្សារលើ'
+            : 'សាខាបេនឡាន';
+        session.data.branch = branchLabel;
+        session.data.shippingAddress = `${session.data.courierService || 'ខាងដឹក'} - ${branchLabel}, ខេត្ត ${session.data.province || ''}`;
+        session.step = 'awaiting_shipping_notes';
+        await this.promptRiderNotes(chatId, session.data);
+      }
+      return;
+    }
+
+    // Quick Khan selection for Phnom Penh
+    if (data.startsWith('ship_khan_')) {
+      const khan = data.replace('ship_khan_', '');
+      const session = this.customerStates.get(String(chatId));
+      if (session) {
+        session.data.shippingAddress = `រាជធានីភ្នំពេញ, ${khan}`;
+        session.data.province = 'រាជធានីភ្នំពេញ';
+        session.step = 'awaiting_shipping_notes';
+        await this.promptRiderNotes(chatId, session.data);
+      }
+      return;
+    }
+
+    // Step 5: Rider Notes Callbacks
+    if (data === 'ship_note_skip') {
+      const session = this.customerStates.get(String(chatId));
+      if (session) {
+        await this.completeShippingCheckout(chatId, { id: typeof chatId === 'number' ? chatId : 0, username, first_name: firstName }, session.data, '');
+      }
+      return;
+    }
+
+    if (data === 'ship_note_call15') {
+      const session = this.customerStates.get(String(chatId));
+      if (session) {
+        await this.completeShippingCheckout(chatId, { id: typeof chatId === 'number' ? chatId : 0, username, first_name: firstName }, session.data, 'ខលមុនពេលមកដល់ 15 នាទី');
+      }
+      return;
+    }
+
+    if (data === 'ship_note_afternoon') {
+      const session = this.customerStates.get(String(chatId));
+      if (session) {
+        await this.completeShippingCheckout(chatId, { id: typeof chatId === 'number' ? chatId : 0, username, first_name: firstName }, session.data, 'ដឹកពេលរសៀល');
+      }
+      return;
+    }
+
+    if (data === 'ship_note_gate') {
+      const session = this.customerStates.get(String(chatId));
+      if (session) {
+        await this.completeShippingCheckout(chatId, { id: typeof chatId === 'number' ? chatId : 0, username, first_name: firstName }, session.data, 'ទុកនៅមុខទ្វាររបងផ្ទះ');
       }
       return;
     }
@@ -3130,7 +3563,17 @@ export class TelegramBotService {
         return;
       }
 
-      // 3. Text Message
+      // 3. Location Drop Pin (GPS)
+      if (update.message.location) {
+        await this.handleLocationMessage(
+          update.message.chat.id,
+          update.message.location,
+          update.message.from || { id: update.message.chat.id }
+        );
+        return;
+      }
+
+      // 4. Text Message
       if (update.message.text) {
         await this.handleTextMessage(
           update.message.chat.id,

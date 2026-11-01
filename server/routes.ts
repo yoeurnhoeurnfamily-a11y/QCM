@@ -334,26 +334,38 @@ apiRouter.post('/orders/:id/cancel', (req, res) => {
 
 apiRouter.put('/orders/:id/shipping', async (req, res) => {
   const orderId = req.params.id;
-  const { shippingStatus, trackingNumber, shippingRecipient, shippingPhone, shippingAddress } = req.body;
+  const {
+    shippingStatus,
+    trackingNumber,
+    courierService,
+    shippingNotes,
+    shippingRecipient,
+    shippingPhone,
+    shippingAddress
+  } = req.body;
   const existing = db.getOrders().find(o => o.id === orderId);
   if (!existing) return res.status(404).json({ error: 'Order not found' });
+
+  const isNowShipped = shippingStatus === 'shipped' && existing.shippingStatus !== 'shipped';
+  const hasNewTracking = trackingNumber && trackingNumber !== existing.trackingNumber;
 
   const updated = db.updateOrder(orderId, {
     shippingStatus: shippingStatus || existing.shippingStatus,
     trackingNumber: trackingNumber !== undefined ? trackingNumber : existing.trackingNumber,
+    courierService: courierService || existing.courierService,
+    shippingNotes: shippingNotes !== undefined ? shippingNotes : existing.shippingNotes,
     shippingRecipient: shippingRecipient || existing.shippingRecipient,
     shippingPhone: shippingPhone || existing.shippingPhone,
     shippingAddress: shippingAddress || existing.shippingAddress
   });
 
-  // Notify customer on Telegram if tracking number was updated
-  if (trackingNumber && trackingNumber !== existing.trackingNumber && existing.telegramId) {
-    const notifyMsg = `🚚 <b>ដំណឹងដឹកជញ្ជូនសៀវភៅ (#${orderId})</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
-      `📖 <b>សៀវភៅ៖</b> ${existing.productName}\n` +
-      `📦 <b>លេខកូដតាមដានកញ្ចប់អីវ៉ាន់ (Tracking):</b> <code>${trackingNumber}</code>\n` +
-      `📍 <b>ស្ថានភាព៖</b> ${shippingStatus === 'shipped' ? 'កំពុងដឹកជញ្ជូន' : shippingStatus === 'delivered' ? 'បានប្រគល់ជូនរួច' : 'កំពុងរៀបចំ'}\n\n` +
-      `សូមរង់ចាំទទួលទូរស័ព្ទពីខាងអ្នកដឹកជញ្ជូន។ សូមអរគុណ! 🙏`;
-    await TelegramBotService.sendMessage(existing.telegramId, notifyMsg, { parse_mode: 'HTML' });
+  // Automatically push rich dispatch notification to customer on Telegram
+  if ((isNowShipped || hasNewTracking) && existing.telegramId && updated) {
+    try {
+      await TelegramBotService.notifyOrderShipped(updated);
+    } catch (err) {
+      console.error('Failed to notify customer of shipment dispatch:', err);
+    }
   }
 
   res.json({ success: true, order: updated });

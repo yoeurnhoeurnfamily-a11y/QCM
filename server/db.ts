@@ -322,6 +322,7 @@ const INITIAL_SETTINGS: BotSettings = {
   stockDepletedPolicyMessage: '⚠️ សូមអភ័យទោស! ស្តុកសៀវភៅត្រូវបានលក់អស់ក្នុងពេលដំណាលគ្នា។ សូមទាក់ទង Admin ដើម្បីទទួលបានការបញ្ចូលស្តុក ឬសងប្រាក់វិញភ្លាមៗ។',
   isPollingActive: true,
   shippingFeePhnomPenh: 1.25,
+  shippingFeeSameDay: 2.00,
   shippingFeeProvince: 1.75,
   freeShippingThreshold: 15.00,
   khrExchangeRate: 4100

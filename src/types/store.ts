@@ -129,6 +129,12 @@ export interface Order {
   shippingAddress?: string;
   shippingStatus?: 'pending' | 'preparing' | 'shipped' | 'delivered';
   shippingFee?: number;
+  shippingSpeed?: 'standard' | 'express';
+  shippingNotes?: string;
+  shippingLocation?: { latitude: number; longitude: number; googleMapsUrl?: string };
+  province?: string;
+  branch?: string;
+  courierService?: string;
   totalAmountKhr?: number;
   items?: Array<{ productId: string; productName: string; quantity: number; unitPrice: number; bookFormat?: string }>;
   receiptDataUrl?: string;
@@ -173,6 +179,7 @@ export interface BotSettings {
   stockDepletedPolicyMessage: string;
   isPollingActive: boolean;
   shippingFeePhnomPenh?: number;
+  shippingFeeSameDay?: number;
   shippingFeeProvince?: number;
   freeShippingThreshold?: number;
   khrExchangeRate?: number;
