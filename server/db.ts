@@ -497,10 +497,16 @@ class StoreDatabase {
     return this.data.products[idx];
   }
 
+  public reload(): AppStoreData {
+    this.data = this.loadData();
+    return this.data;
+  }
+
   public deleteProduct(id: string): boolean {
     const beforeLen = this.data.products.length;
     this.data.products = this.data.products.filter(p => p.id !== id);
     if (this.data.products.length !== beforeLen) {
+      this.data.stock = this.data.stock.filter(s => s.productId !== id);
       this.saveData(undefined, true);
       return true;
     }

@@ -42,6 +42,7 @@ export const StockView: React.FC<StockViewProps> = ({
   const [editContent, setEditContent] = useState('');
   const [editItemStatus, setEditItemStatus] = useState<StockItem['status']>('available');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<StockItem | null>(null);
 
   // Bulk import modal
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -289,11 +290,7 @@ export const StockView: React.FC<StockViewProps> = ({
                             </button>
                           )}
                           <button
-                            onClick={() => {
-                              if (confirm('តើអ្នកពិតជាចង់លុប Stock Item នេះចេញពីប្រព័ន្ធមែនទេ?')) {
-                                onDeleteStockItem(item.id);
-                              }
-                            }}
+                            onClick={() => setItemToDelete(item)}
                             className="p-1.5 rounded-xl bg-[#231224] hover:bg-[#321734] border border-rose-500/30 hover:border-rose-400/50 text-[#ff5c8a] hover:text-rose-300 transition-all active:scale-95 cursor-pointer shadow-xs"
                             title="លុបចេញពីស្តុក"
                           >
@@ -453,10 +450,9 @@ export const StockView: React.FC<StockViewProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    if (confirm('តើអ្នកពិតជាចង់លុប Stock Item នេះចេញពីប្រព័ន្ធមែនទេ?')) {
-                      onDeleteStockItem(editingItem.id);
-                      setEditingItem(null);
-                    }
+                    const toDel = editingItem;
+                    setEditingItem(null);
+                    setItemToDelete(toDel);
                   }}
                   className="p-2 rounded-xl bg-[#231224] hover:bg-[#321734] border border-rose-500/30 hover:border-rose-400/50 text-[#ff5c8a] hover:text-rose-300 transition-all active:scale-95 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                 >
@@ -482,6 +478,58 @@ export const StockView: React.FC<StockViewProps> = ({
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Delete Stock Item Confirmation Modal */}
+      {itemToDelete && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-rose-500/40 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3.5">
+              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 shrink-0">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-white">
+                  តើអ្នកពិតជាចង់លុប Stock Item នេះ?
+                </h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  ទិន្នន័យស្តុកនេះនឹងត្រូវដកចេញពីប្រព័ន្ធភ្លាមៗ។
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1 text-xs">
+              <div className="text-slate-400">ខ្លឹមសារស្តុក (License / កូដ)៖</div>
+              <div className="font-mono text-slate-200 text-xs bg-slate-900 p-2 rounded-lg break-all">
+                {itemToDelete.content}
+              </div>
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-slate-400">ស្ថានភាព៖</span>
+                <span className="font-medium text-amber-400">{itemToDelete.status}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setItemToDelete(null)}
+                className="btn-secondary px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                បោះបង់
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  await onDeleteStockItem(itemToDelete.id);
+                  setItemToDelete(null);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-rose-900/40"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>បាទ/ចាស លុបចេញ</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

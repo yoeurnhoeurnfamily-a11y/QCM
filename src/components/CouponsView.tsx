@@ -24,6 +24,7 @@ export const CouponsView: React.FC<CouponsViewProps> = ({
   const [maxUses, setMaxUses] = useState('100');
   const [isActive, setIsActive] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [couponToDelete, setCouponToDelete] = useState<Coupon | null>(null);
 
   const openCreateModal = () => {
     setEditingCoupon(null);
@@ -155,11 +156,7 @@ export const CouponsView: React.FC<CouponsViewProps> = ({
                           </button>
                         )}
                         <button
-                          onClick={() => {
-                            if (confirm(`តើអ្នកពិតជាចង់លុប Coupon "${cpn.code}" មែនទេ?`)) {
-                              onDeleteCoupon(cpn.id);
-                            }
-                          }}
+                          onClick={() => setCouponToDelete(cpn)}
                           className="p-1.5 rounded-xl bg-[#231224] hover:bg-[#321734] border border-rose-500/30 hover:border-rose-400/50 text-[#ff5c8a] hover:text-rose-300 transition-all active:scale-95 cursor-pointer shadow-xs"
                           title="លុប Coupon"
                         >
@@ -283,10 +280,9 @@ export const CouponsView: React.FC<CouponsViewProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      if (confirm(`តើអ្នកពិតជាចង់លុប Coupon "${editingCoupon.code}" មែនទេ?`)) {
-                        onDeleteCoupon(editingCoupon.id);
-                        setIsModalOpen(false);
-                      }
+                      const toDel = editingCoupon;
+                      setIsModalOpen(false);
+                      setCouponToDelete(toDel);
                     }}
                     className="p-2 rounded-xl bg-[#231224] hover:bg-[#321734] border border-rose-500/30 hover:border-rose-400/50 text-[#ff5c8a] hover:text-rose-300 transition-all active:scale-95 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                   >
@@ -315,6 +311,63 @@ export const CouponsView: React.FC<CouponsViewProps> = ({
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Coupon Modal */}
+      {couponToDelete && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-rose-500/40 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3.5">
+              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 shrink-0">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-white">
+                  តើអ្នកពិតជាចង់លុប Coupon នេះ?
+                </h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  កូដបញ្ចុះតម្លៃនេះនឹងត្រូវដកចេញពីប្រព័ន្ធ មិនអាចប្រើបានទៀតឡើយ។
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">កូដ Coupon៖</span>
+                <span className="font-mono font-bold text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-900/40">
+                  {couponToDelete.code}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">ការបញ្ចុះតម្លៃ៖</span>
+                <span className="font-semibold text-emerald-400">
+                  {couponToDelete.type === 'percentage' ? `${couponToDelete.value}%` : `$${couponToDelete.value.toFixed(2)} USD`}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setCouponToDelete(null)}
+                className="btn-secondary px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                បោះបង់
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  await onDeleteCoupon(couponToDelete.id);
+                  setCouponToDelete(null);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-rose-900/40"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>បាទ/ចាស លុបចេញ</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

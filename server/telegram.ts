@@ -2345,6 +2345,12 @@ export class TelegramBotService {
       shippingRecipient?: string;
       shippingPhone?: string;
       shippingAddress?: string;
+      shippingSpeed?: 'standard' | 'express';
+      shippingNotes?: string;
+      shippingLocation?: { latitude: number; longitude: number; googleMapsUrl?: string };
+      province?: string;
+      branch?: string;
+      courierService?: string;
     }
   ) {
     const product = db.getProducts().find(p => p.id === productId);

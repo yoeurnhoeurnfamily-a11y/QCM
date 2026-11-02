@@ -39,9 +39,6 @@ export const BroadcastView: React.FC<BroadcastViewProps> = ({
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
-    if (!confirm(`តើអ្នកពិតជាចង់ផ្ញើសារនេះទៅកាន់អតិថិជន Telegram ទាំងអស់ (${customers.length} នាក់) មែនទេ?`)) {
-      return;
-    }
     setIsSending(true);
     setResult(null);
     try {

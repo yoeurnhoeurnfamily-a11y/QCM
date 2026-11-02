@@ -105,9 +105,6 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
   };
 
   const handleManualFulfill = async (orderId: string) => {
-    if (!confirm(`តើអ្នកពិតជាចង់ Fulfill ការបញ្ជាទិញ #${orderId} ដោយដៃមែនទេ? (ប្រព័ន្ធនឹងប្រគល់សៀវភៅទៅកាន់ Telegram អតិថិជនភ្លាមៗ)`)) {
-      return;
-    }
     setIsProcessing(orderId);
     try {
       await onFulfillOrder(orderId);
@@ -117,9 +114,6 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
   };
 
   const handleCancel = async (orderId: string) => {
-    if (!confirm(`តើអ្នកពិតជាចង់បោះបង់ការបញ្ជាទិញ #${orderId} មែនទេ? (ស្តុកសៀវភៅដែលកក់នឹងត្រូវដោះលែងមក Available វិញ)`)) {
-      return;
-    }
     setIsProcessing(orderId);
     try {
       await onCancelOrder(orderId);
@@ -129,9 +123,6 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
   };
 
   const handleDelete = async (orderId: string) => {
-    if (!confirm(`⚠️ តើអ្នកពិតជាចង់លុបការបញ្ជាទិញ #${orderId} នេះចេញពីប្រព័ន្ធមែនទេ?\n(ប្រសិនបើស្តុកកំពុងកក់ វានឹងត្រូវដោះលែងមកវិញដោយស្វ័យប្រវត្តិ)`)) {
-      return;
-    }
     if (!onDeleteOrder) return;
     setIsProcessing(orderId);
     try {

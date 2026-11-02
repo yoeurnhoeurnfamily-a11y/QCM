@@ -15,7 +15,8 @@ import {
   Download,
   Bookmark,
   History,
-  Clock
+  Clock,
+  AlertTriangle
 } from 'lucide-react';
 import type { Product, BulkPricingTier } from '../types/store';
 
@@ -36,6 +37,8 @@ export const ProductsView: React.FC<ProductsViewProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formatFilter, setFormatFilter] = useState<'all' | 'pdf' | 'printed'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
@@ -392,10 +395,9 @@ export const ProductsView: React.FC<ProductsViewProps> = ({
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
-                    onClick={() => {
-                      if (confirm(`តើអ្នកពិតជាចង់លុបសៀវភៅ "${prod.name}" មែនទេ?`)) {
-                        onDeleteProduct(prod.id);
-                      }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setProductToDelete(prod);
                     }}
                     className="p-1.5 rounded-xl bg-[#231224] hover:bg-[#321734] border border-rose-500/30 hover:border-rose-400/50 text-[#ff5c8a] hover:text-rose-300 transition-all active:scale-95 cursor-pointer shadow-xs"
                     title="លុបសៀវភៅ"
@@ -779,12 +781,7 @@ export const ProductsView: React.FC<ProductsViewProps> = ({
                 {editingProduct ? (
                   <button
                     type="button"
-                    onClick={() => {
-                      if (confirm(`⚠️ តើអ្នកពិតជាចង់លុបសៀវភៅ "${editingProduct.name}" ចេញពីប្រព័ន្ធមែនទេ?`)) {
-                        onDeleteProduct(editingProduct.id);
-                        setIsModalOpen(false);
-                      }
-                    }}
+                    onClick={() => setProductToDelete(editingProduct)}
                     className="p-2 rounded-xl bg-[#231224] hover:bg-[#321734] border border-rose-500/30 hover:border-rose-400/50 text-[#ff5c8a] hover:text-rose-300 transition-all active:scale-95 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -810,6 +807,93 @@ export const ProductsView: React.FC<ProductsViewProps> = ({
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* In-App Delete Confirmation Modal (Safe for iframe / No blocked window.confirm) */}
+      {productToDelete && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-rose-500/40 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3.5">
+              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 shrink-0">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-white">
+                  តើអ្នកពិតជាចង់លុបសៀវភៅនេះចេញពីប្រព័ន្ធ?
+                </h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  សៀវភៅនេះរួមទាំងទិន្នន័យស្តុកដែលពាក់ព័ន្ធ នឹងត្រូវដកចេញពីបញ្ជីទំនិញនៅលើ Dashboard និង Telegram Bot ភ្លាមៗ។
+                </p>
+              </div>
+            </div>
+
+            {/* Product details preview */}
+            <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2 text-xs">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-slate-400 shrink-0">ចំណងជើង៖</span>
+                <span className="font-semibold text-white text-right break-words line-clamp-2">
+                  {productToDelete.name}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">ប្រភេទសៀវភៅ៖</span>
+                <span className="text-slate-300 font-medium">
+                  {productToDelete.bookFormat === 'printed' ? '📖 សៀវភៅព្រីន (Hardcopy)' : '📄 សៀវភៅអេឡិចត្រូនិក PDF'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">តម្លៃលក់៖</span>
+                <span className="font-mono font-bold text-emerald-400">
+                  ${productToDelete.price.toFixed(2)} USD
+                </span>
+              </div>
+              {stockCounts[productToDelete.id] !== undefined && (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">ស្តុកនៅសល់៖</span>
+                  <span className="font-mono text-slate-300">
+                    {stockCounts[productToDelete.id]} {productToDelete.bookFormat === 'printed' ? 'ក្បាល' : 'ច្បាប់'}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setProductToDelete(null)}
+                className="btn-secondary px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-50"
+              >
+                បោះបង់
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={async () => {
+                  try {
+                    setIsDeleting(true);
+                    await onDeleteProduct(productToDelete.id);
+                    setProductToDelete(null);
+                    setIsModalOpen(false);
+                  } finally {
+                    setIsDeleting(false);
+                  }
+                }}
+                className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-rose-900/40 disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <span>កំពុងលុប...</span>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>បាទ/ចាស លុបសៀវភៅចេញ</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

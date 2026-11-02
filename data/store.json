@@ -436,35 +436,6 @@
       "createdAt": "2026-10-30T12:27:52.676Z"
     },
     {
-      "id": "prod_upp_01",
-      "name": "QCM វិទ្យាល័យ",
-      "category": "🏢 ឈុតគ្រូវិទ្យាល័យ (Upper Secondary QCM)",
-      "bookFormat": "pdf",
-      "author": "សាស្ត្រាចារ្យសាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ & NIE",
-      "pages": 330,
-      "fileSize": "15-25 MB",
-      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_upp_01.pdf",
-      "description": "កម្រងសំណួរ QCM កម្រិតឧត្តមសិក្សា សម្រាប់ត្រៀមប្រឡងគ្រូវិទ្យាល័យ (NIE កម្រិត១) គ្របដណ្តប់គ្រប់ផ្នែកសំខាន់ៗ។",
-      "price": 3.5,
-      "bulkPricingEnabled": true,
-      "tiers": [
-        {
-          "minQty": 3,
-          "maxQty": 5,
-          "pricePerUnit": 2.98
-        },
-        {
-          "minQty": 6,
-          "maxQty": null,
-          "pricePerUnit": 2.63
-        }
-      ],
-      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
-      "badge": "🏢 វិទ្យាល័យ QCM",
-      "isActive": true,
-      "createdAt": "2026-10-30T12:27:52.676Z"
-    },
-    {
       "id": "prod_upp_02",
       "name": "គន្លឹះប្រឡងគ្រូវិទ្យាល័យ",
       "category": "🏢 ឈុតគ្រូវិទ្យាល័យ (Upper Secondary QCM)",
@@ -577,6 +548,35 @@
       ],
       "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
       "badge": "🏢 ជំនាញឯកទេស",
+      "isActive": true,
+      "createdAt": "2026-10-30T12:27:52.676Z"
+    },
+    {
+      "id": "prod_upp_01",
+      "name": "QCM វិទ្យាល័យ",
+      "category": "🏢 ឈុតគ្រូវិទ្យាល័យ (Upper Secondary QCM)",
+      "bookFormat": "pdf",
+      "author": "សាស្ត្រាចារ្យសាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ & NIE",
+      "pages": 330,
+      "fileSize": "15-25 MB",
+      "pdfDownloadUrl": "https://khbookstore.com/downloads/pdf/prod_upp_01.pdf",
+      "description": "កម្រងសំណួរ QCM កម្រិតឧត្តមសិក្សា សម្រាប់ត្រៀមប្រឡងគ្រូវិទ្យាល័យ (NIE កម្រិត១) គ្របដណ្តប់គ្រប់ផ្នែកសំខាន់ៗ។",
+      "price": 3.5,
+      "bulkPricingEnabled": true,
+      "tiers": [
+        {
+          "minQty": 3,
+          "maxQty": 5,
+          "pricePerUnit": 2.98
+        },
+        {
+          "minQty": 6,
+          "maxQty": null,
+          "pricePerUnit": 2.63
+        }
+      ],
+      "instructions": "1. ចុច Link ដោនឡូតឯកសារ PDF គុណភាព HD ច្បាស់ 100%\n2. អាចបើកអានលើទូរស័ព្ទ កុំព្យូទ័រ iPad និង Kindle\n3. មាន Key ចម្លើយ & ការពន្យល់លម្អិតនៅចុងសៀវភៅ!",
+      "badge": "🏢 វិទ្យាល័យ QCM",
       "isActive": true,
       "createdAt": "2026-10-30T12:27:52.676Z"
     }
@@ -1641,16 +1641,15 @@
       "walletBalance": 0
     },
     {
-      "id": "cust_1793531170749_243",
-      "telegramId": 6277908085,
-      "username": "yoeurnhoeurn",
-      "firstName": "YOEURN",
-      "lastName": "hoeurn",
-      "joinedAt": "2026-11-01T11:06:10.749Z",
+      "id": "cust_1793635235839_342",
+      "telegramId": 6792615083,
+      "username": "olympicbrightschooladmin",
+      "firstName": "រដ្ឋបាលសេវាកម្មបង្រៀន",
+      "joinedAt": "2026-11-02T16:00:35.839Z",
       "totalOrders": 0,
       "totalSpent": 0,
       "referredBy": null,
-      "referralCode": "ref_6277908085",
+      "referralCode": "ref_6792615083",
       "walletBalance": 0,
       "isBlocked": false
     }
@@ -1763,6 +1762,7 @@
     "stockDepletedPolicyMessage": "⚠️ សូមអភ័យទោស! ស្តុកសៀវភៅត្រូវបានលក់អស់ក្នុងពេលដំណាលគ្នា។ សូមទាក់ទង Admin ដើម្បីទទួលបានការបញ្ចូលស្តុក ឬសងប្រាក់វិញភ្លាមៗ។",
     "isPollingActive": true,
     "shippingFeePhnomPenh": 1.25,
+    "shippingFeeSameDay": 2,
     "shippingFeeProvince": 1.75,
     "freeShippingThreshold": 15,
     "khrExchangeRate": 4100

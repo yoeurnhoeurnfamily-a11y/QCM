@@ -139,10 +139,10 @@ export default function App() {
   const handleDeleteProduct = async (id: string) => {
     try {
       await api.deleteProduct(id);
-      showToast('info', 'បានលុបទំនិញរួចរាល់');
+      showToast('success', 'បានលុបសៀវភៅជោគជ័យ!', 'សៀវភៅត្រូវបានដកចេញពីប្រព័ន្ធរួចរាល់');
       await loadAllData(true);
-    } catch {
-      showToast('error', 'លុបទំនិញបរាជ័យ');
+    } catch (err: any) {
+      showToast('error', 'លុបសៀវភៅបរាជ័យ', err?.message || 'សូមព្យាយាមម្តងទៀត');
     }
   };
 

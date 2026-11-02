@@ -62,7 +62,12 @@ export const api = {
   },
 
   async deleteProduct(id: string): Promise<boolean> {
-    return requestOk(`/api/products/${id}`, { method: 'DELETE' });
+    const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to delete product');
+    }
+    return true;
   },
 
   // Stock

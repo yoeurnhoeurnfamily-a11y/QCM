@@ -28,6 +28,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   const [editAddress, setEditAddress] = useState('');
   const [editBalance, setEditBalance] = useState('0');
   const [isSavingCustomer, setIsSavingCustomer] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
   const openEditCustomerModal = (cust: Customer) => {
     setEditingCustomer(cust);
@@ -58,13 +59,8 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
     }
   };
 
-  const handleDeleteCustomer = async (cust: Customer) => {
-    if (!confirm(`⚠️ តើអ្នកពិតជាចង់លុបអតិថិជន "${cust.firstName} (@${cust.username || cust.telegramId})" ចេញពីប្រព័ន្ធមែនទេ?`)) {
-      return;
-    }
-    if (onDeleteCustomer) {
-      await onDeleteCustomer(cust.id);
-    }
+  const handleDeleteCustomer = (cust: Customer) => {
+    setCustomerToDelete(cust);
   };
 
   const handleAdjustBalance = async (isAdd: boolean) => {
@@ -396,6 +392,71 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Customer Confirmation Modal */}
+      {customerToDelete && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-rose-500/40 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3.5">
+              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 shrink-0">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-white">
+                  តើអ្នកពិតជាចង់លុបអតិថិជននេះ?
+                </h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  ទិន្នន័យអតិថិជននេះនឹងត្រូវលុបចេញពីប្រព័ន្ធ។
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">ឈ្មោះអតិថិជន៖</span>
+                <span className="font-semibold text-white">
+                  {customerToDelete.firstName} {customerToDelete.lastName || ''}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Telegram៖</span>
+                <span className="font-mono text-indigo-400">
+                  {customerToDelete.username ? `@${customerToDelete.username}` : customerToDelete.telegramId}
+                </span>
+              </div>
+              {customerToDelete.phone && (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">លេខទូរស័ព្ទ៖</span>
+                  <span className="font-mono text-slate-300">{customerToDelete.phone}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setCustomerToDelete(null)}
+                className="btn-secondary px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                បោះបង់
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (onDeleteCustomer) {
+                    await onDeleteCustomer(customerToDelete.id);
+                  }
+                  setCustomerToDelete(null);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-rose-900/40"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>បាទ/ចាស លុបចេញ</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

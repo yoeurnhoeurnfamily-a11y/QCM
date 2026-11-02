@@ -109,10 +109,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   const handleRestore = async (filename: string, createdAt: string) => {
-    const formatted = new Date(createdAt).toLocaleString();
-    if (!confirm(`⚠️ តើអ្នកប្រាកដជាចង់ស្តារទិន្នន័យពី Backup កាលបរិច្ឆេទ "${formatted}" នេះមែនទេ?\n\n(ប្រព័ន្ធនឹងចម្លងទិន្នន័យបច្ចុប្បន្នទុកជា Backup ស្វ័យប្រវត្តិកុំឱ្យបាត់បង់សិន មុនពេលស្តារឡើងវិញ)`)) {
-      return;
-    }
 
     setRestoringFilename(filename);
     setBackupMsg(null);
