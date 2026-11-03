@@ -484,6 +484,24 @@ export class TelegramBotService {
       return true;
     }
 
+    // Telegram photo caption maximum limit is 1024 characters.
+    // If caption exceeds 1000 characters, send photo with concise caption and full message via sendMessage.
+    if (caption && caption.length > 1000) {
+      try {
+        const conciseCaption = `🇰🇭 <b>វិក្កយបត្របង់ប្រាក់ KHQR (YOEURN HOEURN)</b>\n👇 <i>សូមពិនិត្យព័ត៌មានលម្អិត និងចុច Link ខាងក្រោម៖</i>`;
+        const formData = new FormData();
+        formData.append('chat_id', String(chatId));
+        formData.append('caption', conciseCaption);
+        formData.append('parse_mode', 'HTML');
+        const blob = new Blob([new Uint8Array(photoBuffer)], { type: 'image/png' });
+        formData.append('photo', blob, 'khqr_payment.png');
+        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: formData });
+        return await this.sendMessage(chatId, caption, options);
+      } catch (err: any) {
+        console.warn('sendPhoto split fallback error:', err.message);
+      }
+    }
+
     try {
       const formData = new FormData();
       formData.append('chat_id', String(chatId));
@@ -506,6 +524,21 @@ export class TelegramBotService {
 
       if (!response.ok) {
         const errText = await response.text();
+        if (errText.includes('caption is too long')) {
+          console.warn('[Telegram] Caption too long for sendPhoto, retrying with split message');
+          try {
+            const formDataRetry = new FormData();
+            formDataRetry.append('chat_id', String(chatId));
+            formDataRetry.append('caption', `🇰🇭 <b>វិក្កយបត្របង់ប្រាក់ KHQR (YOEURN HOEURN)</b>`);
+            formDataRetry.append('parse_mode', 'HTML');
+            const blob = new Blob([new Uint8Array(photoBuffer)], { type: 'image/png' });
+            formDataRetry.append('photo', blob, 'khqr_payment.png');
+            await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: formDataRetry });
+            return await this.sendMessage(chatId, caption, options);
+          } catch {
+            // fallback
+          }
+        }
         this.handleApiError('sendPhoto', chatId, response.status, errText);
         return false;
       }
@@ -545,6 +578,26 @@ export class TelegramBotService {
       return true;
     }
 
+    // Guard against Telegram 1024 char caption limit
+    if (caption && caption.length > 1000) {
+      try {
+        const conciseCaption = `🇰🇭 <b>វិក្កយបត្របង់ប្រាក់ KHQR (YOEURN HOEURN)</b>\n👇 <i>សូមពិនិត្យព័ត៌មានលម្អិតខាងក្រោម៖</i>`;
+        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            photo: fileIdOrUrl,
+            caption: conciseCaption,
+            parse_mode: 'HTML'
+          })
+        });
+        return await this.sendMessage(chatId, caption, options);
+      } catch {
+        // fallback
+      }
+    }
+
     try {
       const response = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
         method: 'POST',
@@ -560,6 +613,24 @@ export class TelegramBotService {
 
       if (!response.ok) {
         const errText = await response.text();
+        if (errText.includes('caption is too long')) {
+          console.warn('[Telegram] Caption too long for sendPhotoFileId, retrying with split message');
+          try {
+            await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: chatId,
+                photo: fileIdOrUrl,
+                caption: `🇰🇭 <b>វិក្កយបត្របង់ប្រាក់ KHQR (YOEURN HOEURN)</b>`,
+                parse_mode: 'HTML'
+              })
+            });
+            return await this.sendMessage(chatId, caption, options);
+          } catch {
+            // fallback
+          }
+        }
         this.handleApiError('sendPhotoFileId', chatId, response.status, errText);
         return false;
       }
@@ -2033,7 +2104,7 @@ export class TelegramBotService {
       `└ 💵 <b>តម្លៃសៀវភៅទិញសរុប៖</b> <code>${formatDualPrice(finalTotalAmount, khrRate)}</code>\n\n` +
       `💬 <b>សួស្តី! នេះជា KHQR របស់ខ្ញុំឈ្មោះ "${accountHolderName}"</b>\n` +
       `សូមចុចតំណភ្ជាប់នេះដើម្បីទូទាត់ (តម្លៃសរុប៖ <b>$${finalTotalAmount.toFixed(2)} USD</b>)៖\n` +
-      `👉 <a href="${dynamicPaymentLink}">${dynamicPaymentLink}</a>\n\n` +
+      `👉 <a href="${dynamicPaymentLink}">https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&amp;key=khqr</a>\n\n` +
       `📌 <b>ជម្រើសនៃការទូទាត់ប្រាក់៖</b>\n` +
       `1. <b>ចុចប៊ូតុង [📲 បើកទូទាត់ ACLEDA KHQR ($${finalTotalAmount.toFixed(2)})]</b> ខាងក្រោម\n` +
       `2. <b>ឬស្កេនរូបភាព QR ខាងលើ</b> ជាមួយ App ធនាគារណាមួយ (ACLEDA, ABA, Wing, Bakong...)\n` +
@@ -2786,7 +2857,7 @@ export class TelegramBotService {
       `└ 💵 <b>តម្លៃសៀវភៅទិញសរុប៖</b> <code>${formatDualPrice(finalTotalAmount, khrRate)}</code>\n\n` +
       `💬 <b>សួស្តី! នេះជា KHQR របស់ខ្ញុំឈ្មោះ "${accountHolderName}"</b>\n` +
       `សូមចុចតំណភ្ជាប់នេះដើម្បីទូទាត់ (តម្លៃសរុប៖ <b>$${finalTotalAmount.toFixed(2)} USD</b>)៖\n` +
-      `👉 <a href="${dynamicPaymentLink}">${dynamicPaymentLink}</a>\n\n` +
+      `👉 <a href="${dynamicPaymentLink}">https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&amp;key=khqr</a>\n\n` +
       `📌 <b>ជម្រើសនៃការទូទាត់ប្រាក់៖</b>\n` +
       `1. <b>ចុចប៊ូតុង [📲 បើកទូទាត់ ACLEDA KHQR ($${finalTotalAmount.toFixed(2)})]</b> ខាងក្រោម\n` +
       `2. <b>ឬស្កេនរូបភាព QR ខាងលើ</b> ជាមួយ App ធនាគារណាមួយ (ACLEDA, ABA, Wing, Bakong...)\n` +
