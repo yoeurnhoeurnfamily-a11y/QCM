@@ -37,7 +37,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   settings,
   onUpdateSettings
 }) => {
-  const [formData, setFormData] = useState<BotSettings>({ ...settings });
+  const [formData, setFormData] = useState<BotSettings>({
+    ...settings,
+    supportUsername: settings.supportUsername || 'yoeurnhoeurn',
+    adminTelegramId: settings.adminTelegramId || '6277908085',
+    supportPhone: settings.supportPhone || '087301610'
+  });
   const [isSaved, setIsSaved] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -73,6 +78,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [isCreatingBackup, setIsCreatingBackup] = useState(false);
   const [restoringFilename, setRestoringFilename] = useState<string | null>(null);
   const [backupMsg, setBackupMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    setFormData({
+      ...settings,
+      supportUsername: settings.supportUsername || 'yoeurnhoeurn',
+      adminTelegramId: settings.adminTelegramId || '6277908085',
+      supportPhone: settings.supportPhone || '087301610'
+    });
+  }, [settings]);
 
   useEffect(() => {
     loadBackups();
@@ -135,7 +149,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     setIsSubmitting(true);
     setIsSaved(false);
     try {
-      await onUpdateSettings(formData);
+      const payload: BotSettings = {
+        ...formData,
+        supportUsername: formData.supportUsername?.trim() || 'yoeurnhoeurn',
+        adminTelegramId: formData.adminTelegramId?.trim() || '6277908085',
+        supportPhone: formData.supportPhone?.trim() || '087301610'
+      };
+      await onUpdateSettings(payload);
+      setFormData(payload);
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 3000);
     } finally {
@@ -602,9 +623,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 type="text"
                 value={formData.supportUsername}
                 onChange={(e) => handleChange('supportUsername', e.target.value.replace('@', ''))}
-                placeholder="store_admin_support"
+                placeholder="yoeurnhoeurn"
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-hidden focus:border-indigo-500"
               />
+              <p className="text-[10px] text-slate-500 mt-1">Username សម្រាប់អតិថិជនចុចឆាតទៅកាន់ Admin Support (លំនាំដើម៖ @yoeurnhoeurn)</p>
             </div>
 
             <div>
@@ -621,17 +643,28 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
 
             <div>
-              <label className="block text-slate-300 font-medium mb-1">
-                Admin Telegram Chat ID (ទទួល Slip ផ្ទាល់ខ្លួន)
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-slate-300 font-medium">
+                  Admin Telegram Chat ID (ទទួល Slip ផ្ទាល់ខ្លួន)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => handleChange('adminTelegramId', '6277908085')}
+                  className="text-[10px] text-indigo-400 hover:text-indigo-300 bg-indigo-950/70 border border-indigo-700/50 hover:border-indigo-500/70 px-2 py-0.5 rounded-md cursor-pointer transition-colors font-medium flex items-center gap-1 shadow-xs"
+                >
+                  <span>⚡ ទាញយក ID ពី @yoeurnhoeurn (6277908085)</span>
+                </button>
+              </div>
               <input
                 type="text"
                 value={formData.adminTelegramId || ''}
                 onChange={(e) => handleChange('adminTelegramId', e.target.value)}
-                placeholder="ឧ. 99881122"
+                placeholder="6277908085"
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-indigo-500"
               />
-              <p className="text-[10px] text-slate-500 mt-1">ទទួល Slip ផ្ទាល់ខ្លួន និងប៊ូតុង [✅ Approve] / [❌ Reject]</p>
+              <p className="text-[10px] text-slate-500 mt-1">
+                ទទួល Slip ផ្ទាល់ខ្លួន និងប៊ូតុង [✅ Approve] / [❌ Reject] (ភ្ជាប់ផ្ទាល់ជាមួយ @yoeurnhoeurn Telegram ID: 6277908085)
+              </p>
             </div>
 
             <div>
@@ -656,10 +689,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 type="text"
                 value={formData.supportPhone || ''}
                 onChange={(e) => handleChange('supportPhone', e.target.value)}
-                placeholder="012 889 900 / 098 776 655"
+                placeholder="087301610"
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-indigo-500"
               />
-              <p className="text-[10px] text-slate-500 mt-1">បង្ហាញក្នុងប៊ូតុង [📞 ជំនួយ & ទំនាក់ទំនង]</p>
+              <p className="text-[10px] text-slate-500 mt-1">បង្ហាញក្នុងប៊ូតុង [📞 ជំនួយ & ទំនាក់ទំនង] លើ Telegram Bot (លំនាំដើម៖ 087301610)</p>
             </div>
           </div>
         </div>

@@ -806,7 +806,7 @@ export class TelegramBotService {
 
     const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [
-        { text: '💬 សួរនាំ Admin បន្ថែម', url: `https://t.me/${settings.supportUsername || 'kh_bookstore_support'}` }
+        { text: '💬 សួរនាំ Admin បន្ថែម', url: `https://t.me/${settings.supportUsername || 'yoeurnhoeurn'}` }
       ],
       [
         { text: '🔙 ត្រឡប់ទៅតាមដាន', callback_data: 'track_menu' },
@@ -1023,8 +1023,8 @@ export class TelegramBotService {
    */
   public static async sendSupport(chatId: number | string) {
     const settings = db.getSettings();
-    const supportUser = settings.supportUsername || 'kh_bookstore_support';
-    const supportPhone = settings.supportPhone || '012 889 900 / 098 776 543';
+    const supportUser = settings.supportUsername || 'yoeurnhoeurn';
+    const supportPhone = settings.supportPhone || '087301610';
 
     const msg = `📞 <b>មជ្ឈមណ្ឌលជំនួយ & សេវាកម្មអតិថិជន (SUPPORT 24/7)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
       `សូមស្វាគមន៍មកកាន់ផ្នែកបម្រើអតិថិជន! ក្រុមការងាររង់ចាំជួយសម្រួលលោកអ្នកគ្រប់ពេល 24 ម៉ោង/7 ថ្ងៃ៖\n\n` +
@@ -1304,7 +1304,7 @@ export class TelegramBotService {
       `👇 <i>សូមចុចលើប៊ូតុងឈុតសៀវភៅខាងក្រោម ដើម្បីជ្រើសរើសសៀវភៅ៖</i>`;
 
     const settings = db.getSettings();
-    const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const supportUser = settings.supportUsername || 'yoeurnhoeurn';
 
     const inlineKeyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [{ text: '👶 ១. ឈុតគ្រូមតេយ្យសិក្សា (5 មុខ)', callback_data: 'cat_pre' }],
@@ -1396,7 +1396,7 @@ export class TelegramBotService {
 
     const nextDec = Math.max(1, validQty - 1);
     const nextInc = availableStock > 0 ? Math.min(availableStock, validQty + 1) : validQty + 1;
-    const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const supportUser = settings.supportUsername || 'yoeurnhoeurn';
     const userCart = this.getCart(chatId);
     const cartCount = userCart.reduce((sum, item) => sum + item.qty, 0);
 
@@ -1772,7 +1772,7 @@ export class TelegramBotService {
       `1. <b>ស្កេន KHQR</b> ខាងលើជាមួយ App ធនាគារ (Bakong, ABA, Wing, ACLEDA...)\n` +
       `2. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n`;
 
-    const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const supportUser = settings.supportUsername || 'yoeurnhoeurn';
     const bakongDeepLink = payment.checkoutUrl || `https://link.payway.com.kh/checkout?qr=${encodeURIComponent(payment.qrString || orderId)}`;
     const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [
@@ -2295,7 +2295,7 @@ export class TelegramBotService {
       `\n💬 <i>ប្រសិនបើមានសំណួរ ឬត្រូវការជំនួយបន្ទាន់ សូមចុចប៊ូតុងខាងក្រោម៖</i>`;
 
     const settings = db.getSettings();
-    const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const supportUser = settings.supportUsername || 'yoeurnhoeurn';
 
     await this.sendMessage(chatId, confirmMsg, {
       reply_markup: {
@@ -2512,7 +2512,7 @@ export class TelegramBotService {
         ? `🚚 <b>ការដឹកជញ្ជូន៖</b> ក្រុមការងារនឹងវេចខ្ចប់ និងបញ្ជូនតាម <b>${newOrder.shippingAddress}</b> ជូនលោកអ្នក!`
         : `⚡ <b>ឯកសារ PDF៖</b> ប្រព័ន្ធនឹងផ្ញើតំណភ្ជាប់ទាញយក PDF ជូនភ្លាមៗដោយស្វ័យប្រវត្តិនឹងពេលទូទាត់ជោគជ័យ!`);
 
-    const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const supportUser = settings.supportUsername || 'yoeurnhoeurn';
     const bakongDeepLink = payment.checkoutUrl || `https://link.payway.com.kh/checkout?qr=${encodeURIComponent(payment.qrString || orderId)}`;
     const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [
@@ -2609,7 +2609,7 @@ export class TelegramBotService {
       const policyMsg = settings.stockDepletedPolicyMessage || 'សូមអភ័យទោស! ស្តុកសៀវភៅត្រូវបានលក់អស់ក្នុងពេលដំណាលគ្នា។ សូមទាក់ទង Admin ដើម្បីទទួលបានការបញ្ចូលស្តុក ឬសងប្រាក់វិញភ្លាមៗ។';
       await this.sendMessage(
         chatId,
-        `⚠️ <b>ជូនដំណឹងស្តីពីស្ថានភាពស្តុក៖</b>\n━━━━━━━━━━━━━━━━━━━━\n${policyMsg}\n\n👤 Admin: @${settings.supportUsername || 'kh_bookstore_support'}`,
+        `⚠️ <b>ជូនដំណឹងស្តីពីស្ថានភាពស្តុក៖</b>\n━━━━━━━━━━━━━━━━━━━━\n${policyMsg}\n\n👤 Admin: @${settings.supportUsername || 'yoeurnhoeurn'}`,
         { reply_markup: this.getMainReplyKeyboard(), parse_mode: 'HTML' }
       );
 
@@ -2716,7 +2716,7 @@ export class TelegramBotService {
               { text: '📥 បើកទាញយកសៀវភៅ PDF ឥឡូវនេះ', url: firstLink }
             ],
             [
-              { text: '💬 សាកសួរ Admin បន្ថែម', url: `https://t.me/${settings.supportUsername || 'kh_bookstore_support'}` }
+              { text: '💬 សាកសួរ Admin បន្ថែម', url: `https://t.me/${settings.supportUsername || 'yoeurnhoeurn'}` }
             ]
           ]
         };
@@ -2820,7 +2820,7 @@ export class TelegramBotService {
   public static async notifyOrderShipped(order: Order) {
     if (!order.telegramId) return;
     const settings = db.getSettings();
-    const supportUser = settings.supportUsername || 'kh_bookstore_support';
+    const supportUser = settings.supportUsername || 'yoeurnhoeurn';
     const isExpress = order.shippingSpeed === 'express';
 
     let msg = `🚚 <b>ដំណឹងកញ្ចប់សៀវភៅត្រូវបានចេញដំណើរ (ORDER DISPATCHED)!</b>\n━━━━━━━━━━━━━━━━━━━━\n\n` +
@@ -3049,7 +3049,7 @@ export class TelegramBotService {
         db.saveData();
         await this.sendMessage(
           order.telegramId,
-          `❌ <b>វិក្កយបត្រ #${orderId} មិនត្រឹមត្រូវ</b>\n━━━━━━━━━━━━━━━━━━━━\nAdmin បានត្រួតពិនិត្យ Slip បង់ប្រាក់ ប៉ុន្តែមិនអាចផ្ទៀងផ្ទាត់បានទេ។ សូមទាក់ទងមក Admin ឬពិនិត្យការផ្ទេរប្រាក់ឡើងវិញ។\n\n👤 Admin: @${db.getSettings().supportUsername || 'kh_bookstore_support'}`,
+          `❌ <b>វិក្កយបត្រ #${orderId} មិនត្រឹមត្រូវ</b>\n━━━━━━━━━━━━━━━━━━━━\nAdmin បានត្រួតពិនិត្យ Slip បង់ប្រាក់ ប៉ុន្តែមិនអាចផ្ទៀងផ្ទាត់បានទេ។ សូមទាក់ទងមក Admin ឬពិនិត្យការផ្ទេរប្រាក់ឡើងវិញ។\n\n👤 Admin: @${db.getSettings().supportUsername || 'yoeurnhoeurn'}`,
           { reply_markup: this.getMainReplyKeyboard(), parse_mode: 'HTML' }
         );
         await this.sendMessage(chatId, `⚠️ បានបដិសេធ (Reject) ការបញ្ជាទិញ #${orderId}។`);

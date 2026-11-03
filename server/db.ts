@@ -210,6 +210,21 @@ const INITIAL_CUSTOMERS: Customer[] = [
     walletBalance: 0.00,
     phone: '077 123 456',
     defaultShippingAddress: 'ភូមិវត្តបូព៌ សង្កាត់សាលាកំរើក ក្រុងសៀមរាប ខេត្តសៀមរាប'
+  },
+  {
+    id: 'cust_yoeurnhoeurn',
+    telegramId: 6277908085,
+    username: 'yoeurnhoeurn',
+    firstName: 'យឿន',
+    lastName: 'ហឿន',
+    joinedAt: new Date(Date.now() - 30 * 86400000).toISOString(),
+    totalOrders: 0,
+    totalSpent: 0,
+    referredBy: null,
+    referralCode: 'ref_6277908085',
+    walletBalance: 0,
+    phone: '087301610',
+    defaultShippingAddress: 'ភ្នំពេញ'
   }
 ];
 
@@ -308,9 +323,10 @@ const INITIAL_SETTINGS: BotSettings = {
   botToken: DEFAULT_TELEGRAM_BOT_TOKEN,
   botUsername: DEFAULT_TELEGRAM_BOT_USERNAME,
   channelId: '',
-  adminTelegramId: '',
+  adminTelegramId: '6277908085',
   adminGroupId: '',
-  supportUsername: 'kh_bookstore_support',
+  supportUsername: 'yoeurnhoeurn',
+  supportPhone: '087301610',
   welcomeMessage: 'សូមស្វាគមន៍មកកាន់ បណ្ណាគារសៀវភៅត្រៀមប្រឡង & QCM KH Store! 📚🎓\n\nយើងខ្ញុំមានផ្គត់ផ្គង់៖\n• 📘 សៀវភៅត្រៀមប្រឡងបាក់ឌុប & ក្របខ័ណ្ឌរដ្ឋ\n• 📝 កម្រងសំណួរ QCM & វិញ្ញាសាជ្រើសរើសចម្លើយ\n• 📑 ឯកសារសិក្សា សង្ខេបមេរៀន & ត្រៀមអាហារូបករណ៍\n\n✨ ទាញយកជា PDF ភ្លាមៗ ឬ កម្មង់សៀវភៅព្រីនដឹកជូនដល់ផ្ទះ!\n🎟️ បញ្ចុះតម្លៃ 10% ភ្លាមៗ ដោយប្រើ Coupon: WELCOME10\n\n👇 សូមចុចលើ Menu [🛒 ទិញសៀវភៅ] ខាងក្រោមដើម្បីចាប់ផ្តើម៖',
   postPurchaseInstructions: '✨ សូមអរគុណចំពោះការគាំទ្រការអាន និងការរៀនសូត្រ!\n📄 សម្រាប់សៀវភៅ PDF៖ លោកអ្នកអាចចុច Link ទាញយកអានបានភ្លាមៗ។\n📖 សម្រាប់សៀវភៅព្រីន៖ ក្រុមការងារនឹងផ្ញើជូនតាមសេវាដឹកជញ្ជូនរហ័ស 24-48 ម៉ោង។ ប្រសិនបើមានចម្ងល់ សូមទាក់ទងមកកាន់ Admin តាមរយៈប៊ូតុងជំនួយ។',
   cutluyApiKey: '',
@@ -364,6 +380,17 @@ class StoreDatabase {
           mergedSettings.botToken = DEFAULT_TELEGRAM_BOT_TOKEN;
           mergedSettings.botUsername = DEFAULT_TELEGRAM_BOT_USERNAME;
           mergedSettings.isPollingActive = true;
+        }
+
+        // Guarantee persistent Admin Support Username, Telegram Chat ID, and Support Phone
+        if (!mergedSettings.supportUsername || mergedSettings.supportUsername.trim() === '' || mergedSettings.supportUsername === 'kh_bookstore_support') {
+          mergedSettings.supportUsername = 'yoeurnhoeurn';
+        }
+        if (!mergedSettings.adminTelegramId || mergedSettings.adminTelegramId.trim() === '') {
+          mergedSettings.adminTelegramId = '6277908085';
+        }
+        if (!mergedSettings.supportPhone || mergedSettings.supportPhone.trim() === '') {
+          mergedSettings.supportPhone = '087301610';
         }
 
         return {
@@ -456,7 +483,17 @@ class StoreDatabase {
 
   // Mutators with Auto-Save and History Preservation
   public updateSettings(settings: Partial<BotSettings>): BotSettings {
-    this.data.settings = { ...this.data.settings, ...settings };
+    const updated = { ...this.data.settings, ...settings };
+    if (!updated.supportUsername || updated.supportUsername.trim() === '') {
+      updated.supportUsername = 'yoeurnhoeurn';
+    }
+    if (!updated.adminTelegramId || updated.adminTelegramId.trim() === '') {
+      updated.adminTelegramId = '6277908085';
+    }
+    if (!updated.supportPhone || updated.supportPhone.trim() === '') {
+      updated.supportPhone = '087301610';
+    }
+    this.data.settings = updated;
     this.saveData(undefined, true);
     return this.data.settings;
   }
