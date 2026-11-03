@@ -1782,7 +1782,9 @@
     "shippingFeeSameDay": 2,
     "shippingFeeProvince": 1.75,
     "freeShippingThreshold": 15,
-    "khrExchangeRate": 4100
+    "khrExchangeRate": 4100,
+    "paymentLink": "https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr",
+    "accountHolderName": "YOEURN HOEURN"
   },
   "knownGroups": []
 }

@@ -341,7 +341,9 @@ const INITIAL_SETTINGS: BotSettings = {
   shippingFeeSameDay: 2.00,
   shippingFeeProvince: 1.75,
   freeShippingThreshold: 15.00,
-  khrExchangeRate: 4100
+  khrExchangeRate: 4100,
+  paymentLink: 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr',
+  accountHolderName: 'YOEURN HOEURN'
 };
 
 class StoreDatabase {
@@ -391,6 +393,12 @@ class StoreDatabase {
         }
         if (!mergedSettings.supportPhone || mergedSettings.supportPhone.trim() === '') {
           mergedSettings.supportPhone = '087301610';
+        }
+        if (!mergedSettings.paymentLink || mergedSettings.paymentLink.trim() === '') {
+          mergedSettings.paymentLink = 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
+        }
+        if (!mergedSettings.accountHolderName || mergedSettings.accountHolderName.trim() === '') {
+          mergedSettings.accountHolderName = 'YOEURN HOEURN';
         }
 
         return {

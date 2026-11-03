@@ -20,6 +20,9 @@ export interface CutLuyPaymentStatusResponse {
   error?: string;
 }
 
+export const DEFAULT_KHQR_PAYMENT_URL = 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
+export const DEFAULT_KHQR_HOLDER_NAME = 'YOEURN HOEURN';
+
 export class CutLuyService {
   /**
    * Create KHQR Payment via CutLuy Gateway
@@ -82,11 +85,12 @@ export class CutLuyService {
       }
     }
 
-    // Graceful fallback / Demo KHQR: generates valid Bakong KHQR EMVCo format string
+    // Graceful fallback: generates valid ACLEDA KHQR payment link and EMVCo format
     const simulatedPaymentId = `pay_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     const standardKhqr = this.generateStandardBakongKHQR(amount, orderId);
 
-    const qrBuffer = await QRCode.toBuffer(standardKhqr, {
+    // Encode ACLEDA KHQR link so scanning directly redirects to YOEURN HOEURN ACLEDA Payment
+    const qrBuffer = await QRCode.toBuffer(DEFAULT_KHQR_PAYMENT_URL, {
       errorCorrectionLevel: 'M',
       margin: 2,
       scale: 8,
@@ -96,7 +100,7 @@ export class CutLuyService {
       }
     });
 
-    const qrDataUrl = await QRCode.toDataURL(standardKhqr, {
+    const qrDataUrl = await QRCode.toDataURL(DEFAULT_KHQR_PAYMENT_URL, {
       errorCorrectionLevel: 'M',
       margin: 2,
       scale: 8
@@ -106,6 +110,7 @@ export class CutLuyService {
       success: true,
       paymentId: simulatedPaymentId,
       qrString: standardKhqr,
+      checkoutUrl: DEFAULT_KHQR_PAYMENT_URL,
       qrBuffer,
       qrDataUrl
     };
@@ -164,7 +169,10 @@ export class CutLuyService {
     const tag29 = `0016cutluy.khqr.merc01${merchantId.length.toString().padStart(2, '0')}${merchantId}`;
     const tag62 = `01${orderRef.length.toString().padStart(2, '0')}${orderRef}`;
     
-    let raw = `00020101021229${tag29.length.toString().padStart(2, '0')}${tag29}52045999530384054${amtStr.length.toString().padStart(2, '0')}${amtStr}5802KH5917KH DIGITAL STORE6010PHNOM PENH62${tag62.length.toString().padStart(2, '0')}${tag62}6304`;
+    const merchantName = DEFAULT_KHQR_HOLDER_NAME;
+    const tag59 = `59${merchantName.length.toString().padStart(2, '0')}${merchantName}`;
+
+    let raw = `00020101021229${tag29.length.toString().padStart(2, '0')}${tag29}52045999530384054${amtStr.length.toString().padStart(2, '0')}${amtStr}5802KH${tag59}6010PHNOM PENH62${tag62.length.toString().padStart(2, '0')}${tag62}6304`;
     
     // Compute simple CRC16 CCITT
     let crc = 0xFFFF;

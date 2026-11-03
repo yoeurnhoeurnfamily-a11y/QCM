@@ -187,6 +187,8 @@ export interface BotSettings {
   webhookEnabled?: boolean;
   webhookSecretToken?: string;
   lastWebhookSync?: string;
+  paymentLink?: string;
+  accountHolderName?: string;
 }
 
 export interface KnownGroup {

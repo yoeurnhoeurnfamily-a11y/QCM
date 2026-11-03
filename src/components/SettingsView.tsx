@@ -697,33 +697,92 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </div>
 
-        {/* SECTION 2: CutLuy Payment Gateway */}
+        {/* SECTION 2: ACLEDA KHQR & Payment Settings */}
         <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-5 space-y-4">
-          <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
-            <DollarSign className="w-4 h-4 text-emerald-400" />
-            <h4 className="font-bold text-white">CutLuy KHQR Payment Gateway (White-Label)</h4>
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-emerald-400" />
+              <h4 className="font-bold text-white">ការទូទាត់ប្រាក់ KHQR (ACLEDA Bank & CutLuy Gateway)</h4>
+            </div>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              Active: ACLEDA KHQR
+            </span>
+          </div>
+
+          {/* Active Payment Notice Banner */}
+          <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/40 to-slate-900 border border-emerald-500/30 text-xs space-y-1">
+            <div className="font-semibold text-emerald-300 flex items-center gap-1.5">
+              <span>🏦 គណនី KHQR បច្ចុប្បន្ន (សម្រាប់រាល់ការទូទាត់បណ្តោះអាសន្ន)៖</span>
+            </div>
+            <p className="text-slate-300 leading-relaxed text-[11px]">
+              រាល់ការបញ្ជាទិញទាំងអស់លើ Telegram Bot ត្រូវបានកំណត់ផ្ញើតំណភ្ជាប់ និងស្កេន KHQR ទៅកាន់គណនី <strong>"YOEURN HOEURN"</strong> (ធនាគារអេស៊ីលីដា / Bakong KHQR) ដោយស្វ័យប្រវត្តិ។
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">
-                CutLuy Live API Key
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-slate-300 font-medium text-xs">
+                  ឈ្មោះគណនី KHQR (Account Holder Name)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => handleChange('accountHolderName', 'YOEURN HOEURN')}
+                  className="text-[10px] text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 border border-emerald-700/50 px-2 py-0.5 rounded cursor-pointer"
+                >
+                  ⚡ កំណត់ "YOEURN HOEURN"
+                </button>
+              </div>
+              <input
+                type="text"
+                value={formData.accountHolderName || 'YOEURN HOEURN'}
+                onChange={(e) => handleChange('accountHolderName', e.target.value)}
+                placeholder="YOEURN HOEURN"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-emerald-500 text-xs"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-slate-300 font-medium text-xs">
+                  តំណភ្ជាប់ទូទាត់ ACLEDA KHQR Link
+                </label>
+                <button
+                  type="button"
+                  onClick={() => handleChange('paymentLink', 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr')}
+                  className="text-[10px] text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 border border-emerald-700/50 px-2 py-0.5 rounded cursor-pointer"
+                >
+                  ⚡ កំណត់ Link ACLEDA
+                </button>
+              </div>
+              <input
+                type="text"
+                value={formData.paymentLink || 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr'}
+                onChange={(e) => handleChange('paymentLink', e.target.value)}
+                placeholder="https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-emerald-500 text-xs"
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-300 font-medium mb-1 text-xs">
+                CutLuy Live API Key (White-Label Optional)
               </label>
               <input
                 type="password"
                 value={formData.cutluyApiKey}
                 onChange={(e) => handleChange('cutluyApiKey', e.target.value.trim())}
                 placeholder="cl_live_xxxxxxxxxxxxxxxxxxxxx"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-emerald-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-emerald-500 text-xs"
               />
               <p className="text-[10px] text-slate-500 mt-1">
-                API Key សម្រាប់បង្កើត KHQR តាម <code>POST https://cutluy.com/v1/payments</code>
+                សម្រាប់ភ្ជាប់ Gateway ស្វ័យប្រវត្តិនាពេលអនាគត
               </p>
             </div>
 
             <div>
-              <label className="block text-slate-300 font-medium mb-1">
-                រយៈពេលផុតកំណត់ KHQR (នាទី)
+              <label className="block text-slate-300 font-medium mb-1 text-xs">
+                រយៈពេលផុតកំណត់វិក្កយបត្រ (នាទី)
               </label>
               <input
                 type="number"
@@ -731,7 +790,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 max="60"
                 value={formData.qrExpiryMinutes}
                 onChange={(e) => handleChange('qrExpiryMinutes', parseInt(e.target.value, 10) || 5)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-emerald-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-hidden focus:border-emerald-500 text-xs"
               />
               <p className="text-[10px] text-slate-500 mt-1">
                 លំនាំដើម 5 នាទី (ផុតកំណត់នឹងដោះលែងស្តុកមកវិញ)

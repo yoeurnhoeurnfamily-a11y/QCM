@@ -1,3 +1,4 @@
+import QRCode from 'qrcode';
 import { db } from './db';
 import { CutLuyService } from './cutluy';
 import type { Order, Product, StockItem, BotSimulatorMessage, Customer, KnownGroup } from '../src/types/store';
@@ -1259,6 +1260,55 @@ export class TelegramBotService {
   }
 
   /**
+   * Official KHQR Payment Information (ACLEDA Bank - YOEURN HOEURN)
+   */
+  public static async sendPaymentHelp(chatId: number | string) {
+    const settings = db.getSettings();
+    const paymentLink = settings.paymentLink || 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
+    const accountName = settings.accountHolderName || 'YOEURN HOEURN';
+    const supportUser = settings.supportUsername || 'yoeurnhoeurn';
+
+    const msg = `🇰🇭 <b>ព័ត៌មានទូទាត់ប្រាក់ (OFFICIAL KHQR PAYMENT)</b>\n━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `💬 <b>សួស្តី! នេះជា KHQR របស់ខ្ញុំឈ្មោះ "${accountName}"</b>\n` +
+      `សូមចុចតំណភ្ជាប់នេះដើម្បីទូទាត់៖\n` +
+      `👉 <a href="${paymentLink}">${paymentLink}</a>\n\n` +
+      `┌ 👤 <b>ឈ្មោះគណនី KHQR៖</b> <b>${accountName}</b>\n` +
+      `├ 🏛️ <b>ធនាគារ៖</b> <b>អេស៊ីលីដា (ACLEDA Bank) / Bakong KHQR</b>\n` +
+      `└ ⚡ <b>ស្កេនបានគ្រប់ធនាគារ៖</b> ACLEDA, ABA, Wing, Bakong, Canadia, Sathapana...\n\n` +
+      `📌 <b>របៀបទូទាត់ប្រាក់៖</b>\n` +
+      `1. <b>ចុចលើ Link ឬប៊ូតុងខាងក្រោម</b> ដើម្បីបើកកម្មវិធីធនាគារទូទាត់ភ្លាមៗ\n` +
+      `2. ឬ <b>ស្កេនរូបភាព QR Code</b> ខាងលើ\n` +
+      `3. ក្រោយពេលផ្ទេរប្រាក់រួច សូម <b>ផ្ញើរូបភាព Slip</b> ចូលក្នុង Chat នេះ ដើម្បី Admin បញ្ជាក់ជូនភ្លាមៗ! ⚡`;
+
+    const inline_keyboard = [
+      [
+        { text: `📲 បើកទូទាត់ ACLEDA KHQR (${accountName})`, url: paymentLink },
+        { text: '🛒 មើលសៀវភៅ & កម្មង់ទិញ', callback_data: 'catalog_menu' }
+      ],
+      [
+        { text: '💬 ឆាតទៅកាន់ Admin Support', url: `https://t.me/${supportUser}` }
+      ]
+    ];
+
+    try {
+      const qrBuffer = await QRCode.toBuffer(paymentLink, {
+        errorCorrectionLevel: 'M',
+        margin: 2,
+        scale: 8
+      });
+      await this.sendPhoto(chatId, qrBuffer, msg, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+    } catch {
+      await this.sendMessage(chatId, msg, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+    }
+  }
+
+  /**
    * Referral Program
    */
   public static async sendReferralProgram(chatId: number | string) {
@@ -1972,16 +2022,24 @@ export class TelegramBotService {
         (newOrder.shippingNotes ? `├ 📝 <b>ចំណាំអ្នកដឹក៖</b> <i>${newOrder.shippingNotes}</i>\n` : '');
     }
 
+    const paymentLink = settings.paymentLink || 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
+    const accountHolderName = settings.accountHolderName || 'YOEURN HOEURN';
+
     caption += `└ ⏱️ <b>សុពលភាព KHQR៖</b> <b>${expiryMinutes} នាទី</b>\n\n` +
+      `🏦 <b>ព័ត៌មានគណនីទូទាត់ប្រាក់ (ACLEDA KHQR)៖</b>\n` +
+      `┌ 👤 <b>ឈ្មោះគណនី៖</b> <b>${accountHolderName}</b>\n` +
+      `└ 🏛️ <b>ធនាគារ៖</b> <b>អេស៊ីលីដា (ACLEDA Bank) / Bakong KHQR</b>\n\n` +
+      `💬 <b>សួស្តី! នេះជា KHQR របស់ខ្ញុំឈ្មោះ "${accountHolderName}"</b>\n` +
+      `សូមចុចតំណភ្ជាប់នេះដើម្បីទូទាត់៖\n` +
+      `👉 <a href="${paymentLink}">${paymentLink}</a>\n\n` +
       `📌 <b>ជម្រើសនៃការទូទាត់ប្រាក់៖</b>\n` +
-      `1. <b>ស្កេន KHQR</b> ខាងលើជាមួយ App ធនាគារ (Bakong, ABA, Wing, ACLEDA...)\n` +
+      `1. <b>ចុចប៊ូតុង [📲 បើកទូទាត់ ACLEDA KHQR]</b> ខាងក្រោម ឬ ស្កេនរូបភាព QR ជាមួយ App ធនាគារណាមួយ (ACLEDA, ABA, Wing, Bakong...)\n` +
       `2. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n`;
 
     const supportUser = settings.supportUsername || 'yoeurnhoeurn';
-    const bakongDeepLink = payment.checkoutUrl || `https://link.payway.com.kh/checkout?qr=${encodeURIComponent(payment.qrString || orderId)}`;
     const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [
-        { text: '📲 បើកក្នុង ABA / Bakong App', url: bakongDeepLink },
+        { text: `📲 បើកទូទាត់ ACLEDA KHQR (${accountHolderName})`, url: paymentLink },
         { text: '🔄 ពិនិត្យការទូទាត់ (Check)', callback_data: `check_pay_${orderId}` }
       ],
       [
@@ -2714,19 +2772,27 @@ export class TelegramBotService {
         (newOrder.shippingNotes ? `├ 📝 <b>ចំណាំអ្នកដឹក៖</b> <i>${newOrder.shippingNotes}</i>\n` : '');
     }
 
+    const paymentLink = settings.paymentLink || 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
+    const accountHolderName = settings.accountHolderName || 'YOEURN HOEURN';
+
     caption += `└ ⏱️ <b>សុពលភាព KHQR៖</b> <b>${expiryMinutes} នាទី</b>\n\n` +
+      `🏦 <b>ព័ត៌មានគណនីទូទាត់ប្រាក់ (ACLEDA KHQR)៖</b>\n` +
+      `┌ 👤 <b>ឈ្មោះគណនី៖</b> <b>${accountHolderName}</b>\n` +
+      `└ 🏛️ <b>ធនាគារ៖</b> <b>អេស៊ីលីដា (ACLEDA Bank) / Bakong KHQR</b>\n\n` +
+      `💬 <b>សួស្តី! នេះជា KHQR របស់ខ្ញុំឈ្មោះ "${accountHolderName}"</b>\n` +
+      `សូមចុចតំណភ្ជាប់នេះដើម្បីទូទាត់៖\n` +
+      `👉 <a href="${paymentLink}">${paymentLink}</a>\n\n` +
       `📌 <b>ជម្រើសនៃការទូទាត់ប្រាក់៖</b>\n` +
-      `1. <b>ស្កេន KHQR</b> ខាងលើជាមួយ App ធនាគារ (Bakong, ABA, Wing, ACLEDA...) — ប្រព័ន្ធពិនិត្យស្វ័យប្រវត្តិ 24/7!\n` +
+      `1. <b>ចុចប៊ូតុង [📲 បើកទូទាត់ ACLEDA KHQR]</b> ខាងក្រោម ឬ ស្កេនរូបភាព QR ជាមួយ App ធនាគារណាមួយ (ACLEDA, ABA, Wing, Bakong...)\n` +
       `2. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n\n` +
       (isPrinted
         ? `🚚 <b>ការដឹកជញ្ជូន៖</b> ក្រុមការងារនឹងវេចខ្ចប់ និងបញ្ជូនតាម <b>${newOrder.shippingAddress}</b> ជូនលោកអ្នក!`
         : `⚡ <b>ឯកសារ PDF៖</b> ប្រព័ន្ធនឹងផ្ញើតំណភ្ជាប់ទាញយក PDF ជូនភ្លាមៗដោយស្វ័យប្រវត្តិនឹងពេលទូទាត់ជោគជ័យ!`);
 
     const supportUser = settings.supportUsername || 'yoeurnhoeurn';
-    const bakongDeepLink = payment.checkoutUrl || `https://link.payway.com.kh/checkout?qr=${encodeURIComponent(payment.qrString || orderId)}`;
     const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [
-        { text: '📲 បើកក្នុង ABA / Bakong App', url: bakongDeepLink },
+        { text: `📲 បើកទូទាត់ ACLEDA KHQR (${accountHolderName})`, url: paymentLink },
         { text: '🔄 ពិនិត្យការទូទាត់ (Check)', callback_data: `check_pay_${orderId}` }
       ],
       [
@@ -3694,6 +3760,22 @@ export class TelegramBotService {
     }
 
     const lowerText = rawText.toLowerCase();
+
+    // 5.1 Payment Information / KHQR / ACLEDA / Bank Account
+    if (
+      rawText.includes('បង់ប្រាក់') ||
+      rawText.includes('ទូទាត់') ||
+      lowerText.includes('khqr') ||
+      lowerText.includes('acleda') ||
+      lowerText.includes('payment') ||
+      lowerText.includes('qr') ||
+      rawText.includes('លេខកុង') ||
+      rawText.includes('គណនី') ||
+      lowerText.includes('bank')
+    ) {
+      await this.sendPaymentHelp(chatId);
+      return;
+    }
 
     // 6. Direct Match by Teacher Exam Category Keywords
     if (lowerText.includes('មតេយ្យ') || lowerText.includes('preschool')) {
