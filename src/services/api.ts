@@ -219,11 +219,19 @@ export const api = {
   },
 
   // Broadcast
-  async sendBroadcast(message: string): Promise<{ total: number; sent: number; failed: number }> {
-    return requestJson<{ total: number; sent: number; failed: number }>('/api/broadcast', {
+  async getBroadcastTargets(): Promise<{ usersCount: number; groupsCount: number; totalCount: number; groups: any[] }> {
+    return requestJson<{ usersCount: number; groupsCount: number; totalCount: number; groups: any[] }>('/api/broadcast/targets');
+  },
+
+  async sendBroadcast(
+    message: string,
+    target: 'all' | 'users' | 'groups' = 'all',
+    photoUrl?: string
+  ): Promise<{ total: number; sent: number; failed: number; target: string }> {
+    return requestJson<{ total: number; sent: number; failed: number; target: string }>('/api/broadcast', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ message, target, photoUrl })
     });
   },
 

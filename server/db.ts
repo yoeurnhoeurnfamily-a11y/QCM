@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import type { AppStoreData, Product, StockItem, Customer, Order, Coupon, BotSettings, BackupRecord, EditHistoryEntry } from '../src/types/store';
+import type { AppStoreData, Product, StockItem, Customer, Order, Coupon, BotSettings, BackupRecord, EditHistoryEntry, KnownGroup } from '../src/types/store';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -399,7 +399,8 @@ class StoreDatabase {
           customers: parsed.customers || INITIAL_CUSTOMERS,
           orders: uniqueOrders,
           coupons: parsed.coupons || INITIAL_COUPONS,
-          settings: mergedSettings
+          settings: mergedSettings,
+          knownGroups: parsed.knownGroups || []
         };
       }
     } catch (err) {
@@ -412,7 +413,8 @@ class StoreDatabase {
       customers: INITIAL_CUSTOMERS,
       orders: INITIAL_ORDERS,
       coupons: INITIAL_COUPONS,
-      settings: INITIAL_SETTINGS
+      settings: INITIAL_SETTINGS,
+      knownGroups: []
     };
 
     this.saveData(initialData);
@@ -479,6 +481,28 @@ class StoreDatabase {
 
   public getSettings(): BotSettings {
     return this.data.settings;
+  }
+
+  public getKnownGroups(): KnownGroup[] {
+    if (!this.data.knownGroups) this.data.knownGroups = [];
+    return this.data.knownGroups;
+  }
+
+  public addKnownGroup(group: KnownGroup): void {
+    if (!this.data.knownGroups) this.data.knownGroups = [];
+    const idx = this.data.knownGroups.findIndex(g => String(g.id) === String(group.id));
+    if (idx !== -1) {
+      this.data.knownGroups[idx] = { ...this.data.knownGroups[idx], ...group };
+    } else {
+      this.data.knownGroups.push(group);
+    }
+    this.saveData(undefined, true);
+  }
+
+  public removeKnownGroup(id: string | number): void {
+    if (!this.data.knownGroups) return;
+    this.data.knownGroups = this.data.knownGroups.filter(g => String(g.id) !== String(id));
+    this.saveData(undefined, true);
   }
 
   // Mutators with Auto-Save and History Preservation

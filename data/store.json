@@ -1783,5 +1783,6 @@
     "shippingFeeProvince": 1.75,
     "freeShippingThreshold": 15,
     "khrExchangeRate": 4100
-  }
+  },
+  "knownGroups": []
 }

@@ -325,10 +325,15 @@ export default function App() {
   };
 
   // Broadcast Handlers
-  const handleSendBroadcast = async (message: string) => {
+  const handleSendBroadcast = async (
+    message: string,
+    target: 'all' | 'users' | 'groups' = 'all',
+    photoUrl?: string
+  ) => {
     try {
-      const res = await api.sendBroadcast(message);
-      showToast('success', 'ការផ្សាយដំណឹងបានបញ្ចប់!', `ផ្ញើបាន ${res.sent}/${res.total} នាក់`);
+      const res = await api.sendBroadcast(message, target, photoUrl);
+      const targetLabel = target === 'all' ? 'Users & គ្រុបទាំងអស់' : target === 'users' ? 'Users តែប៉ុណ្ណោះ' : 'គ្រុបទាំងអស់';
+      showToast('success', 'ការផ្សាយដំណឹងបានបញ្ចប់!', `ផ្ញើបាន ${res.sent}/${res.total} (${targetLabel})`);
       await loadAllData(true);
       return res;
     } catch {

@@ -461,30 +461,36 @@ apiRouter.put('/settings', (req, res) => {
 // ==========================================
 // 8. BROADCAST
 // ==========================================
+apiRouter.get('/broadcast/targets', (req, res) => {
+  const { userTargets, groupTargets } = TelegramBotService.getAllBroadcastTargets();
+  res.json({
+    usersCount: userTargets.length,
+    groupsCount: groupTargets.length,
+    totalCount: userTargets.length + groupTargets.length,
+    groups: groupTargets
+  });
+});
+
 apiRouter.post('/broadcast', async (req, res) => {
-  const { message } = req.body;
+  const { message, target, photoUrl } = req.body;
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Message content is required' });
   }
 
-  const allCustomers = db.getCustomers();
-  const activeCustomers = allCustomers.filter(c => !c.isBlocked);
-  let successCount = 0;
-  let failCount = 0;
+  const broadcastTarget = (['all', 'users', 'groups'].includes(target) ? target : 'all') as 'all' | 'users' | 'groups';
+  const result = await TelegramBotService.executeBroadcast(broadcastTarget, {
+    text: message,
+    photoUrl: photoUrl
+  });
 
-  for (const cust of activeCustomers) {
-    try {
-      const sent = await TelegramBotService.sendMessage(cust.telegramId, message, { parse_mode: 'HTML' });
-      if (sent) successCount++;
-      else failCount++;
-      // Brief rate-limit protection
-      await new Promise(r => setTimeout(r, 100));
-    } catch {
-      failCount++;
-    }
-  }
-
-  res.json({ total: allCustomers.length, eligible: activeCustomers.length, sent: successCount, failed: failCount });
+  res.json({
+    success: true,
+    target: broadcastTarget,
+    total: broadcastTarget === 'users' ? result.totalUsers : broadcastTarget === 'groups' ? result.totalGroups : (result.totalUsers + result.totalGroups),
+    sent: result.userSuccess + result.groupSuccess,
+    failed: result.failCount,
+    details: result
+  });
 });
 
 // ==========================================

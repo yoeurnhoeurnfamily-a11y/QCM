@@ -189,6 +189,13 @@ export interface BotSettings {
   lastWebhookSync?: string;
 }
 
+export interface KnownGroup {
+  id: string | number;
+  title?: string;
+  type?: 'group' | 'supergroup' | 'channel' | string;
+  addedAt: string;
+}
+
 export interface AppStoreData {
   products: Product[];
   stock: StockItem[];
@@ -196,6 +203,7 @@ export interface AppStoreData {
   orders: Order[];
   coupons: Coupon[];
   settings: BotSettings;
+  knownGroups?: KnownGroup[];
 }
 
 export interface DashboardStats {

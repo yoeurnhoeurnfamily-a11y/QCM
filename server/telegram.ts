@@ -1,6 +1,6 @@
 import { db } from './db';
 import { CutLuyService } from './cutluy';
-import type { Order, Product, StockItem, BotSimulatorMessage } from '../src/types/store';
+import type { Order, Product, StockItem, BotSimulatorMessage, Customer, KnownGroup } from '../src/types/store';
 
 // Helper for splitting productId and qty where productId can contain underscores (e.g. prod_canva_01)
 export function parseProductAndQty(actionStr: string, prefix: string): { productId: string; qty: number } | null {
@@ -143,6 +143,211 @@ export class TelegramBotService {
 
   public static clearCart(chatId: string | number): void {
     this.userCarts.set(String(chatId), []);
+  }
+
+  // In-memory owner broadcast drafts: draftId -> draft data
+  private static ownerBroadcastDrafts: Map<string, {
+    text: string;
+    photoUrl?: string;
+    sender: string;
+    createdAt: number;
+  }> = new Map();
+
+  /**
+   * Check if a Telegram user is the store owner @yoeurnhoeurn
+   */
+  public static isOwnerUser(chatId: number | string, username?: string): boolean {
+    const settings = db.getSettings();
+    const strId = String(chatId);
+    const u = (username || '').toLowerCase().replace('@', '');
+    return strId === '6277908085' ||
+      u === 'yoeurnhoeurn' ||
+      Boolean(settings.adminTelegramId && strId === settings.adminTelegramId.trim());
+  }
+
+  /**
+   * Retrieve all eligible Broadcast targets (Users and Groups/Channels)
+   */
+  public static getAllBroadcastTargets(): {
+    userTargets: Customer[];
+    groupTargets: Array<{ id: string | number; title: string }>;
+  } {
+    const settings = db.getSettings();
+    const userTargets = db.getCustomers().filter(c => !c.isBlocked);
+    const groupMap = new Map<string, { id: string | number; title: string }>();
+
+    // 1. Groups recorded from bot member updates / messages
+    for (const g of db.getKnownGroups()) {
+      groupMap.set(String(g.id), { id: g.id, title: g.title || `Telegram Group (${g.id})` });
+    }
+
+    // 2. Team admin group from settings
+    if (settings.adminGroupId && settings.adminGroupId.trim()) {
+      const gId = settings.adminGroupId.trim();
+      if (!groupMap.has(gId)) {
+        groupMap.set(gId, { id: gId, title: 'Telegram Team Group (Admin)' });
+      }
+    }
+
+    // 3. Alerts Channel from settings
+    if (settings.channelId && settings.channelId.trim()) {
+      const chId = settings.channelId.trim();
+      if (!groupMap.has(chId)) {
+        groupMap.set(chId, { id: chId, title: 'Telegram Channel (Alerts)' });
+      }
+    }
+
+    return {
+      userTargets,
+      groupTargets: Array.from(groupMap.values())
+    };
+  }
+
+  /**
+   * Prompt owner with an interactive dispatch menu to broadcast to Users and Groups
+   */
+  public static async promptOwnerBroadcast(
+    chatId: number | string,
+    messageText: string,
+    senderUsername: string,
+    photoFileId?: string
+  ): Promise<void> {
+    const draftId = `bc_${Date.now()}`;
+    this.ownerBroadcastDrafts.set(draftId, {
+      text: messageText,
+      photoUrl: photoFileId,
+      sender: senderUsername,
+      createdAt: Date.now()
+    });
+
+    const { userTargets, groupTargets } = this.getAllBroadcastTargets();
+
+    const groupListPreview = groupTargets.length > 0
+      ? groupTargets.slice(0, 3).map(g => `  • ${g.title}`).join('\n') + (groupTargets.length > 3 ? `\n  • ...និង ${groupTargets.length - 3} គ្រុបផ្សេងទៀត` : '')
+      : '  (មិនទាន់មានគ្រុបបន្ថែម)';
+
+    const totalTargets = userTargets.length + groupTargets.length;
+
+    const previewMsg = `📢 <b>ប្រព័ន្ធផ្សាយសារផ្ទាល់ពីម្ចាស់ហាង (@yoeurnhoeurn)</b>\n━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `📝 <b>ខ្លឹមសារសារដែលត្រូវផ្សាយ៖</b>\n` +
+      `«<i>${messageText}</i>»\n\n` +
+      (photoFileId ? `🖼️ <i>(ភ្ជាប់ជាមួយរូបភាព 1 សន្លឹក)</i>\n\n` : '') +
+      `🎯 <b>ស្ថិតិគោលដៅទទួលសារបច្ចុប្បន្ន៖</b>\n` +
+      `• 👥 <b>User/អតិថិជនទាំងអស់៖</b> <b>${userTargets.length}</b> នាក់\n` +
+      `• 🏢 <b>គ្រុប/ឆានែលទាំងអស់៖</b> <b>${groupTargets.length}</b> គ្រុប\n` +
+      `${groupListPreview}\n\n` +
+      `👇 <b>សូមជ្រើសរើសគោលដៅដែលត្រូវបញ្ជូនសារនេះ៖</b>`;
+
+    const inline_keyboard = [
+      [
+        { text: `🚀 ផ្ញើទៅ Users & គ្រុបទាំងអស់ (${totalTargets})`, callback_data: `bc_exec_all_${draftId}` }
+      ],
+      [
+        { text: `👥 ផ្ញើទៅតែ Users ទាំងអស់ (${userTargets.length})`, callback_data: `bc_exec_users_${draftId}` },
+        { text: `🏢 ផ្ញើទៅតែ គ្រុបទាំងអស់ (${groupTargets.length})`, callback_data: `bc_exec_groups_${draftId}` }
+      ],
+      [
+        { text: '❌ បោះបង់ (Cancel)', callback_data: `bc_cancel_${draftId}` }
+      ]
+    ];
+
+    if (photoFileId) {
+      await this.sendPhotoFileId(chatId, photoFileId, previewMsg, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+    } else {
+      await this.sendMessage(chatId, previewMsg, {
+        reply_markup: { inline_keyboard },
+        parse_mode: 'HTML'
+      });
+    }
+  }
+
+  /**
+   * Execute Broadcast dispatch to Users and/or Groups
+   */
+  public static async executeBroadcast(
+    target: 'all' | 'users' | 'groups',
+    content: { text: string; photoUrl?: string },
+    operatorChatId?: number | string
+  ): Promise<{
+    totalUsers: number;
+    userSuccess: number;
+    totalGroups: number;
+    groupSuccess: number;
+    failCount: number;
+  }> {
+    const { userTargets, groupTargets } = this.getAllBroadcastTargets();
+    const shouldSendUsers = target === 'all' || target === 'users';
+    const shouldSendGroups = target === 'all' || target === 'groups';
+
+    let userSuccess = 0;
+    let groupSuccess = 0;
+    let failCount = 0;
+
+    const formattedMessage = content.text;
+
+    // Send to Users
+    if (shouldSendUsers) {
+      for (const u of userTargets) {
+        try {
+          let sent = false;
+          if (content.photoUrl) {
+            sent = await this.sendPhotoFileId(u.telegramId, content.photoUrl, formattedMessage, { parse_mode: 'HTML' });
+          } else {
+            sent = await this.sendMessage(u.telegramId, formattedMessage, { parse_mode: 'HTML' });
+          }
+          if (sent) userSuccess++;
+          else failCount++;
+          await new Promise(r => setTimeout(r, 40));
+        } catch {
+          failCount++;
+        }
+      }
+    }
+
+    // Send to Groups
+    if (shouldSendGroups) {
+      for (const g of groupTargets) {
+        try {
+          let sent = false;
+          if (content.photoUrl) {
+            sent = await this.sendPhotoFileId(g.id, content.photoUrl, formattedMessage, { parse_mode: 'HTML' });
+          } else {
+            sent = await this.sendMessage(g.id, formattedMessage, { parse_mode: 'HTML' });
+          }
+          if (sent) groupSuccess++;
+          else failCount++;
+          await new Promise(r => setTimeout(r, 40));
+        } catch {
+          failCount++;
+        }
+      }
+    }
+
+    // If operator chatId is provided, send completion report
+    if (operatorChatId) {
+      const report = `✅ <b>ការផ្សាយសារ (Broadcast) បានបញ្ចប់ជោគជ័យ!</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+        `📊 <b>ស្ថិតិនៃការបញ្ជូន៖</b>\n` +
+        (shouldSendUsers ? `• 👥 <b>Users ទទួលបាន៖</b> <b>${userSuccess}/${userTargets.length}</b> នាក់\n` : '') +
+        (shouldSendGroups ? `• 🏢 <b>គ្រុប/ឆានែលទទួលបាន៖</b> <b>${groupSuccess}/${groupTargets.length}</b> គ្រុប\n` : '') +
+        `• ⚠️ <b>បរាជ័យ/Blocked៖</b> ${failCount}\n\n` +
+        `⏱️ <b>ពេលវេលា៖</b> ${new Date().toLocaleTimeString('km-KH')}`;
+
+      await this.sendMessage(operatorChatId, report, {
+        reply_markup: this.getMainReplyKeyboard(),
+        parse_mode: 'HTML'
+      });
+    }
+
+    return {
+      totalUsers: userTargets.length,
+      userSuccess,
+      totalGroups: groupTargets.length,
+      groupSuccess,
+      failCount
+    };
   }
 
   /**
@@ -2257,6 +2462,11 @@ export class TelegramBotService {
     }
 
     if (!pendingOrder) {
+      if (this.isOwnerUser(chatId, username)) {
+        await this.promptOwnerBroadcast(chatId, caption || '', username, fileIdOrUrl);
+        return;
+      }
+
       await this.sendMessage(
         chatId,
         `📸 <b>ទទួលបានរូបភាព!</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
@@ -3282,6 +3492,55 @@ export class TelegramBotService {
       await this.handleStart(chatId, username, firstName);
       return;
     }
+
+    // 13. Owner Broadcast Execution & Cancellation
+    if (data.startsWith('bc_exec_')) {
+      const parts = data.split('_'); // ['bc', 'exec', 'all|users|groups', '<draftId>']
+      const targetType = parts[2] as 'all' | 'users' | 'groups';
+      const draftId = parts.slice(3).join('_');
+      const draft = this.ownerBroadcastDrafts.get(draftId);
+
+      if (!this.isOwnerUser(chatId, username)) {
+        await this.answerCallbackQuery(query.id, '❌ មានតែម្ចាស់ហាង @yoeurnhoeurn ប៉ុណ្ណោះដែលអាចបញ្ជាមុខងារនេះបាន!', true);
+        return;
+      }
+
+      if (!draft) {
+        await this.answerCallbackQuery(query.id, '⚠️ សារព្រាងនេះបានផុតកំណត់ ឬត្រូវបានលុបរួចហើយ!', true);
+        return;
+      }
+
+      await this.answerCallbackQuery(query.id, '🚀 កំពុងចាប់ផ្តើមបញ្ជូនសារ...');
+      await this.sendMessage(chatId, '⏳ <b>កំពុងដំណើរការផ្សាយសារ (Broadcasting)...</b>\nសូមរង់ចាំបន្តិច ប្រព័ន្ធនឹងផ្ញើរបាយការណ៍លទ្ធផលជូនលោកអ្នកនៅពេលបញ្ចប់។', { parse_mode: 'HTML' });
+
+      // Clean up draft
+      this.ownerBroadcastDrafts.delete(draftId);
+
+      // Execute broadcast
+      await this.executeBroadcast(targetType, { text: draft.text, photoUrl: draft.photoUrl }, chatId);
+      return;
+    }
+
+    if (data.startsWith('bc_cancel_')) {
+      const draftId = data.replace('bc_cancel_', '');
+      this.ownerBroadcastDrafts.delete(draftId);
+      await this.answerCallbackQuery(query.id, '❌ បានបោះបង់ការផ្សាយសារ។');
+      await this.sendMessage(chatId, '❌ បានបោះបង់ការផ្សាយសាររួចរាល់។', {
+        reply_markup: this.getMainReplyKeyboard()
+      });
+      return;
+    }
+
+    if (data === 'owner_prompt_bc') {
+      if (this.isOwnerUser(chatId, username)) {
+        await this.sendMessage(
+          chatId,
+          `📝 <b>សូមវាយឆាតសារ ឬផ្ញើរូបភាពដែលលោកអ្នកចង់ផ្សាយដំណឹងចូលក្នុង Chat នេះ៖</b>\n\nបន្ទាប់មក Bot នឹងរៀបចំប៊ូតុង 1-Click ដើម្បីបញ្ជូនទៅ Users ទាំងអស់ និង គ្រុបទាំងអស់ភ្លាមៗ!`,
+          { parse_mode: 'HTML' }
+        );
+      }
+      return;
+    }
   }
 
   /**
@@ -3303,6 +3562,50 @@ export class TelegramBotService {
         db.upsertCustomer(numericChatId, username, firstName, user.last_name);
       } catch {
         // ignore
+      }
+    }
+
+    const isOwner = this.isOwnerUser(chatId, username);
+
+    // Explicit owner commands
+    if (isOwner) {
+      if (rawText.startsWith('/broadcast') || rawText.startsWith('/bc') || rawText.startsWith('/sendall') || rawText.startsWith('/announce')) {
+        const broadcastText = rawText.replace(/^\/(broadcast|bc|sendall|announce)\s*/i, '').trim();
+        if (!broadcastText) {
+          await this.sendMessage(
+            chatId,
+            `📢 <b>ប្រព័ន្ធផ្សាយដំណឹងរបស់ម្ចាស់ហាង (@yoeurnhoeurn)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+            `លោកអ្នកអាចផ្សាយសារបាន ២ របៀប៖\n` +
+            `1. វាយបញ្ជា៖ <code>/bc &lt;ខ្លឹមសារសារ&gt;</code>\n` +
+            `2. ឬគ្រាន់តែ <b>វាយឆាតសារ ឬផ្ញើរូបភាព</b> ចូលក្នុង Chat នេះភ្លាមៗ នោះ Bot នឹងបង្កើតប៊ូតុងបញ្ជូនសារទៅកាន់ Users និង គ្រុបទាំងអស់ដោយស្វ័យប្រវត្តិ! ⚡`,
+            { reply_markup: this.getMainReplyKeyboard(), parse_mode: 'HTML' }
+          );
+          return;
+        }
+        await this.promptOwnerBroadcast(chatId, broadcastText, username);
+        return;
+      }
+
+      if (rawText === '/admin' || rawText === '/owner' || rawText === '👑 Admin' || rawText === '/help_admin') {
+        const { userTargets, groupTargets } = this.getAllBroadcastTargets();
+        await this.sendMessage(
+          chatId,
+          `👑 <b>ផ្ទាំងគ្រប់គ្រងម្ចាស់ហាង (OWNER CONTROL PANEL)</b>\n━━━━━━━━━━━━━━━━━━━━\n` +
+          `👤 <b>ម្ចាស់ហាង៖</b> @${username || 'yoeurnhoeurn'} (ID: <code>${chatId}</code>)\n` +
+          `👥 <b>Users ទាំងអស់៖</b> <b>${userTargets.length}</b> នាក់\n` +
+          `🏢 <b>គ្រុប & ឆានែល៖</b> <b>${groupTargets.length}</b> គ្រុប\n\n` +
+          `💡 <b>គន្លឹះពិសេស៖</b> លោកអ្នកគ្រាន់តែវាយឆាតសារអ្វីមួយចូលក្នុង Chat នេះ នោះ Bot នឹងរៀបចំប៊ូតុង 1-Click ដើម្បីបាញ់សារនោះទៅកាន់ Users និង គ្រុបទាំងអស់ភ្លាមៗ!`,
+          {
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: '📢 សាកល្បងផ្សាយសារ (Broadcast)', callback_data: 'owner_prompt_bc' }],
+                [{ text: '📦 ពិនិត្យស្តុកសៀវភៅ', callback_data: 'stock_check' }, { text: '🛍️ មើលកាតាឡុក', callback_data: 'catalog_menu' }]
+              ]
+            },
+            parse_mode: 'HTML'
+          }
+        );
+        return;
       }
     }
 
@@ -3439,7 +3742,12 @@ export class TelegramBotService {
       return;
     }
 
-    // Default fallback - show menu
+    // Default fallback - show menu or prompt owner broadcast
+    if (this.isOwnerUser(chatId, username)) {
+      await this.promptOwnerBroadcast(chatId, rawText, username);
+      return;
+    }
+
     await this.handleStart(chatId, username, firstName, user.last_name);
   }
 
@@ -3530,6 +3838,20 @@ export class TelegramBotService {
     if (update.my_chat_member) {
       const chat = update.my_chat_member.chat;
       const newStatus = update.my_chat_member.new_chat_member?.status;
+      if (['group', 'supergroup', 'channel'].includes(chat.type)) {
+        if (newStatus === 'administrator' || newStatus === 'member') {
+          db.addKnownGroup({
+            id: chat.id,
+            title: chat.title || `Group ${chat.id}`,
+            type: chat.type,
+            addedAt: new Date().toISOString()
+          });
+          console.log(`[Telegram] Bot joined/admin in group: ${chat.title} (${chat.id})`);
+        } else if (newStatus === 'left' || newStatus === 'kicked') {
+          db.removeKnownGroup(chat.id);
+          console.log(`[Telegram] Bot left group: ${chat.title} (${chat.id})`);
+        }
+      }
       if (newStatus === 'kicked' || newStatus === 'left') {
         db.setCustomerBlockedStatus(chat.id, true);
         console.log(`[Telegram] User ${chat.id} (${chat.username || chat.first_name || 'user'}) blocked the bot.`);
@@ -3538,6 +3860,17 @@ export class TelegramBotService {
         console.log(`[Telegram] User ${chat.id} (${chat.username || chat.first_name || 'user'}) unblocked the bot.`);
       }
       return;
+    }
+
+    // Auto-record groups or channels where bot is present
+    const incomingChat = update.message?.chat || update.channel_post?.chat;
+    if (incomingChat && ['group', 'supergroup', 'channel'].includes(incomingChat.type)) {
+      db.addKnownGroup({
+        id: incomingChat.id,
+        title: incomingChat.title || `Chat ${incomingChat.id}`,
+        type: incomingChat.type,
+        addedAt: new Date().toISOString()
+      });
     }
 
     if (update.message) {
