@@ -6,6 +6,8 @@ import { apiRouter } from './server/routes';
 import { TelegramBotService } from './server/telegram';
 import { db } from './server/db';
 
+import { renderCheckoutHtml } from './server/checkoutPage';
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,6 +23,39 @@ async function createServer() {
 
   // Mount API routes
   app.use('/api', apiRouter);
+
+  // ACLEDA Direct Payment Page (Showing exact total price)
+  app.get('/acleda', async (req, res) => {
+    const amount = parseFloat(String(req.query.amount || req.query.purchaseAmount || req.query.val || '3.50')) || 3.50;
+    const orderId = String(req.query.order_id || req.query.orderId || req.query.invoice_id || '');
+    const paymentData = String(req.query.payment_data || 'mJzyzR6n');
+    const order = orderId ? db.getOrders().find(o => o.id === orderId) : undefined;
+    const html = await renderCheckoutHtml({
+      orderId: order?.id || orderId,
+      amount: order?.totalAmount || amount,
+      productName: order?.productName,
+      customerName: order?.customerName,
+      paymentData
+    });
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  });
+
+  // Dedicated order payment route
+  app.get('/pay/:orderId', async (req, res) => {
+    const order = db.getOrders().find(o => o.id === req.params.orderId);
+    if (!order) {
+      return res.redirect('/acleda');
+    }
+    const html = await renderCheckoutHtml({
+      orderId: order.id,
+      amount: order.totalAmount,
+      productName: order.productName,
+      customerName: order.customerName
+    });
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  });
 
   // Health check endpoint
   app.get('/api/health', (req, res) => {

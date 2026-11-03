@@ -1,6 +1,6 @@
 import QRCode from 'qrcode';
 import { db } from './db';
-import { CutLuyService } from './cutluy';
+import { CutLuyService, buildAcledaPaymentUrl } from './cutluy';
 import type { Order, Product, StockItem, BotSimulatorMessage, Customer, KnownGroup } from '../src/types/store';
 
 // Helper for splitting productId and qty where productId can contain underscores (e.g. prod_canva_01)
@@ -2022,25 +2022,28 @@ export class TelegramBotService {
         (newOrder.shippingNotes ? `├ 📝 <b>ចំណាំអ្នកដឹក៖</b> <i>${newOrder.shippingNotes}</i>\n` : '');
     }
 
-    const paymentLink = settings.paymentLink || 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
+    const rawPaymentLink = settings.paymentLink || 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
     const accountHolderName = settings.accountHolderName || 'YOEURN HOEURN';
+    const dynamicPaymentLink = buildAcledaPaymentUrl(rawPaymentLink, finalTotalAmount, orderId);
 
     caption += `└ ⏱️ <b>សុពលភាព KHQR៖</b> <b>${expiryMinutes} នាទី</b>\n\n` +
       `🏦 <b>ព័ត៌មានគណនីទូទាត់ប្រាក់ (ACLEDA KHQR)៖</b>\n` +
       `┌ 👤 <b>ឈ្មោះគណនី៖</b> <b>${accountHolderName}</b>\n` +
-      `└ 🏛️ <b>ធនាគារ៖</b> <b>អេស៊ីលីដា (ACLEDA Bank) / Bakong KHQR</b>\n\n` +
+      `├ 🏛️ <b>ធនាគារ៖</b> <b>អេស៊ីលីដា (ACLEDA Bank) / Bakong KHQR</b>\n` +
+      `└ 💵 <b>តម្លៃសៀវភៅទិញសរុប៖</b> <code>${formatDualPrice(finalTotalAmount, khrRate)}</code>\n\n` +
       `💬 <b>សួស្តី! នេះជា KHQR របស់ខ្ញុំឈ្មោះ "${accountHolderName}"</b>\n` +
-      `សូមចុចតំណភ្ជាប់នេះដើម្បីទូទាត់៖\n` +
-      `👉 <a href="${paymentLink}">${paymentLink}</a>\n\n` +
+      `សូមចុចតំណភ្ជាប់នេះដើម្បីទូទាត់ (តម្លៃសរុប៖ <b>$${finalTotalAmount.toFixed(2)} USD</b>)៖\n` +
+      `👉 <a href="${dynamicPaymentLink}">${dynamicPaymentLink}</a>\n\n` +
       `📌 <b>ជម្រើសនៃការទូទាត់ប្រាក់៖</b>\n` +
-      `1. <b>ចុចប៊ូតុង [📲 បើកទូទាត់ ACLEDA KHQR]</b> ខាងក្រោម ឬ ស្កេនរូបភាព QR ជាមួយ App ធនាគារណាមួយ (ACLEDA, ABA, Wing, Bakong...)\n` +
-      `2. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n`;
+      `1. <b>ចុចប៊ូតុង [📲 បើកទូទាត់ ACLEDA KHQR ($${finalTotalAmount.toFixed(2)})]</b> ខាងក្រោម\n` +
+      `2. <b>ឬស្កេនរូបភាព QR ខាងលើ</b> ជាមួយ App ធនាគារណាមួយ (ACLEDA, ABA, Wing, Bakong...)\n` +
+      `3. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n`;
 
     const supportUser = settings.supportUsername || 'yoeurnhoeurn';
     const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [
-        { text: `📲 បើកទូទាត់ ACLEDA KHQR (${accountHolderName})`, url: paymentLink },
-        { text: '🔄 ពិនិត្យការទូទាត់ (Check)', callback_data: `check_pay_${orderId}` }
+        { text: `📲 បើកទូទាត់ ACLEDA KHQR ($${finalTotalAmount.toFixed(2)})`, url: dynamicPaymentLink },
+        { text: '🔄 ពិនិត្យការទូទាត់', callback_data: `check_pay_${orderId}` }
       ],
       [
         { text: '💬 ជំនួយ Admin', url: `https://t.me/${supportUser}` },
@@ -2772,19 +2775,22 @@ export class TelegramBotService {
         (newOrder.shippingNotes ? `├ 📝 <b>ចំណាំអ្នកដឹក៖</b> <i>${newOrder.shippingNotes}</i>\n` : '');
     }
 
-    const paymentLink = settings.paymentLink || 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
+    const rawPaymentLink = settings.paymentLink || 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
     const accountHolderName = settings.accountHolderName || 'YOEURN HOEURN';
+    const dynamicPaymentLink = buildAcledaPaymentUrl(rawPaymentLink, finalTotalAmount, orderId);
 
     caption += `└ ⏱️ <b>សុពលភាព KHQR៖</b> <b>${expiryMinutes} នាទី</b>\n\n` +
       `🏦 <b>ព័ត៌មានគណនីទូទាត់ប្រាក់ (ACLEDA KHQR)៖</b>\n` +
       `┌ 👤 <b>ឈ្មោះគណនី៖</b> <b>${accountHolderName}</b>\n` +
-      `└ 🏛️ <b>ធនាគារ៖</b> <b>អេស៊ីលីដា (ACLEDA Bank) / Bakong KHQR</b>\n\n` +
+      `├ 🏛️ <b>ធនាគារ៖</b> <b>អេស៊ីលីដា (ACLEDA Bank) / Bakong KHQR</b>\n` +
+      `└ 💵 <b>តម្លៃសៀវភៅទិញសរុប៖</b> <code>${formatDualPrice(finalTotalAmount, khrRate)}</code>\n\n` +
       `💬 <b>សួស្តី! នេះជា KHQR របស់ខ្ញុំឈ្មោះ "${accountHolderName}"</b>\n` +
-      `សូមចុចតំណភ្ជាប់នេះដើម្បីទូទាត់៖\n` +
-      `👉 <a href="${paymentLink}">${paymentLink}</a>\n\n` +
+      `សូមចុចតំណភ្ជាប់នេះដើម្បីទូទាត់ (តម្លៃសរុប៖ <b>$${finalTotalAmount.toFixed(2)} USD</b>)៖\n` +
+      `👉 <a href="${dynamicPaymentLink}">${dynamicPaymentLink}</a>\n\n` +
       `📌 <b>ជម្រើសនៃការទូទាត់ប្រាក់៖</b>\n` +
-      `1. <b>ចុចប៊ូតុង [📲 បើកទូទាត់ ACLEDA KHQR]</b> ខាងក្រោម ឬ ស្កេនរូបភាព QR ជាមួយ App ធនាគារណាមួយ (ACLEDA, ABA, Wing, Bakong...)\n` +
-      `2. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n\n` +
+      `1. <b>ចុចប៊ូតុង [📲 បើកទូទាត់ ACLEDA KHQR ($${finalTotalAmount.toFixed(2)})]</b> ខាងក្រោម\n` +
+      `2. <b>ឬស្កេនរូបភាព QR ខាងលើ</b> ជាមួយ App ធនាគារណាមួយ (ACLEDA, ABA, Wing, Bakong...)\n` +
+      `3. <b>ឬផ្ញើរូបភាពវិក្កយបត្របង់ប្រាក់ (Payment Slip)</b> ចូលក្នុង Chat នេះ ដើម្បីឱ្យ Admin បញ្ជាក់ភ្លាមៗ! ⚡\n\n` +
       (isPrinted
         ? `🚚 <b>ការដឹកជញ្ជូន៖</b> ក្រុមការងារនឹងវេចខ្ចប់ និងបញ្ជូនតាម <b>${newOrder.shippingAddress}</b> ជូនលោកអ្នក!`
         : `⚡ <b>ឯកសារ PDF៖</b> ប្រព័ន្ធនឹងផ្ញើតំណភ្ជាប់ទាញយក PDF ជូនភ្លាមៗដោយស្វ័យប្រវត្តិនឹងពេលទូទាត់ជោគជ័យ!`);
@@ -2792,8 +2798,8 @@ export class TelegramBotService {
     const supportUser = settings.supportUsername || 'yoeurnhoeurn';
     const inline_keyboard: Array<Array<{ text: string; callback_data?: string; url?: string }>> = [
       [
-        { text: `📲 បើកទូទាត់ ACLEDA KHQR (${accountHolderName})`, url: paymentLink },
-        { text: '🔄 ពិនិត្យការទូទាត់ (Check)', callback_data: `check_pay_${orderId}` }
+        { text: `📲 បើកទូទាត់ ACLEDA KHQR ($${finalTotalAmount.toFixed(2)})`, url: dynamicPaymentLink },
+        { text: '🔄 ពិនិត្យការទូទាត់', callback_data: `check_pay_${orderId}` }
       ],
       [
         { text: '💬 ជំនួយ Admin', url: `https://t.me/${supportUser}` },

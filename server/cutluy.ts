@@ -23,13 +23,42 @@ export interface CutLuyPaymentStatusResponse {
 export const DEFAULT_KHQR_PAYMENT_URL = 'https://acledabank.com.kh/acleda?payment_data=mJzyzR6n&key=khqr';
 export const DEFAULT_KHQR_HOLDER_NAME = 'YOEURN HOEURN';
 
+/**
+ * Builds dynamic ACLEDA Payment URL containing exact purchase amount and details
+ */
+export function buildAcledaPaymentUrl(baseUrl?: string, amount = 0, orderId?: string): string {
+  const rawBase = (baseUrl || DEFAULT_KHQR_PAYMENT_URL).trim();
+  const amtStr = amount.toFixed(2);
+  const khrRate = db.getSettings().khrExchangeRate || 4100;
+  const amtKhr = Math.round(amount * khrRate);
+
+  try {
+    const url = new URL(rawBase);
+    url.searchParams.set('amount', amtStr);
+    url.searchParams.set('currency', 'USD');
+    url.searchParams.set('purchaseAmount', amtStr);
+    url.searchParams.set('purchaseCurrency', 'USD');
+    url.searchParams.set('val', amtStr);
+    url.searchParams.set('khr', String(amtKhr));
+    if (orderId) {
+      url.searchParams.set('order_id', orderId);
+      url.searchParams.set('invoice_id', orderId);
+    }
+    return url.toString();
+  } catch {
+    const joiner = rawBase.includes('?') ? '&' : '?';
+    return `${rawBase}${joiner}amount=${amtStr}&currency=USD&purchaseAmount=${amtStr}&purchaseCurrency=USD&khr=${amtKhr}${orderId ? `&order_id=${orderId}` : ''}`;
+  }
+}
+
 export class CutLuyService {
   /**
-   * Create KHQR Payment via CutLuy Gateway
+   * Create KHQR Payment via CutLuy Gateway or ACLEDA KHQR
    */
   public static async createPayment(orderId: string, amount: number): Promise<CutLuyCreatePaymentResponse> {
     const settings = db.getSettings();
     const apiKey = settings.cutluyApiKey?.trim();
+    const dynamicPaymentUrl = buildAcledaPaymentUrl(settings.paymentLink || DEFAULT_KHQR_PAYMENT_URL, amount, orderId);
 
     // If API key is provided, attempt live CutLuy API
     if (apiKey) {
@@ -48,10 +77,9 @@ export class CutLuyService {
 
         if (response.ok) {
           const resData: any = await response.json();
-          // CutLuy usually returns { data: { id, qr_string, checkout_url } } or flat
           const paymentId = resData.data?.id || resData.id || resData.payment_id || `cutluy_${Date.now()}`;
           const qrString = resData.data?.qr_string || resData.qr_string || resData.qrString || this.generateStandardBakongKHQR(amount, orderId);
-          const checkoutUrl = resData.data?.checkout_url || resData.checkout_url || null;
+          const checkoutUrl = resData.data?.checkout_url || resData.checkout_url || dynamicPaymentUrl;
 
           const qrBuffer = await QRCode.toBuffer(qrString, {
             errorCorrectionLevel: 'M',
@@ -85,12 +113,12 @@ export class CutLuyService {
       }
     }
 
-    // Graceful fallback: generates valid ACLEDA KHQR payment link and EMVCo format
+    // Graceful fallback: generates valid ACLEDA KHQR payment link and EMVCo format with exact order amount
     const simulatedPaymentId = `pay_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     const standardKhqr = this.generateStandardBakongKHQR(amount, orderId);
 
-    // Encode ACLEDA KHQR link so scanning directly redirects to YOEURN HOEURN ACLEDA Payment
-    const qrBuffer = await QRCode.toBuffer(DEFAULT_KHQR_PAYMENT_URL, {
+    // Encode ACLEDA KHQR link with amount so scanning directly shows YOEURN HOEURN and total price
+    const qrBuffer = await QRCode.toBuffer(dynamicPaymentUrl, {
       errorCorrectionLevel: 'M',
       margin: 2,
       scale: 8,
@@ -100,7 +128,7 @@ export class CutLuyService {
       }
     });
 
-    const qrDataUrl = await QRCode.toDataURL(DEFAULT_KHQR_PAYMENT_URL, {
+    const qrDataUrl = await QRCode.toDataURL(dynamicPaymentUrl, {
       errorCorrectionLevel: 'M',
       margin: 2,
       scale: 8
@@ -110,7 +138,7 @@ export class CutLuyService {
       success: true,
       paymentId: simulatedPaymentId,
       qrString: standardKhqr,
-      checkoutUrl: DEFAULT_KHQR_PAYMENT_URL,
+      checkoutUrl: dynamicPaymentUrl,
       qrBuffer,
       qrDataUrl
     };
